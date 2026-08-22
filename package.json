@@ -1,0 +1,22 @@
+{
+  "name": "foodbridge",
+  "version": "1.0.0",
+  "description": "AI-Powered Surplus Food Rescue and NGO Matching Platform",
+  "private": true,
+  "scripts": {
+    "test": "npm --prefix backend test",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix backend start",
+    "dev:backend": "npm --prefix backend run dev",
+    "dev:frontend": "npm --prefix frontend run dev"
+  },
+  "keywords": [
+    "food-rescue",
+    "ai-agent",
+    "ngo-matching",
+    "sustainability",
+    "hackathon"
+  ],
+  "author": "FoodBridge Team",
+  "license": "MIT"
+}
