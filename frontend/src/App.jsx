@@ -232,6 +232,7 @@ export default function App() {
 
   const [activeTab, setActiveTab] = useState('main'); // 'main', 'ngos', 'governance'
   const [flowStep, setFlowStep] = useState('dashboard'); // 'dashboard', 'create', 'analyzing', 'recommended', 'broadcast_sent'
+  const [supplierSubTab, setSupplierSubTab] = useState('create'); // 'create', 'history'
 
   // Header Single Login Dropdown State & Click-Outside Ref
   const [showLoginMenu, setShowLoginMenu] = useState(false);
@@ -687,6 +688,9 @@ export default function App() {
     setFlowStep('dashboard');
     setShowLoginMenu(false);
   };
+
+  const activeAcceptedLog = historyLogs.find((l) => l.type === 'ACCEPTED');
+  const activeNgoAcceptedLog = historyLogs.find((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1309,556 +1313,587 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-
               </div>
             )}
 
-            {/* FOOD SUPPLIER DASHBOARD (SIDE-BY-SIDE GRID LAYOUT) */}
+            {/* FOOD SUPPLIER DASHBOARD WITH LEFT SIDEBAR NAVIGATION */}
             {userRole === 'supplier' && (
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <h2 style={{ fontSize: '1.6rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
                       <LayoutDashboard style={{ color: 'var(--primary)' }} /> Food Supplier Dashboard — <span className="gradient-text">{supplierName}</span>
                     </h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                      Operational View: Create Surplus Food Donations & Audit Real-Time Activity Stack Side-by-Side.
+                      Operational View: Create Surplus Food Offerings & Audit Persisted Activity Stack.
                     </p>
                   </div>
-
-                  <button onClick={() => setFlowStep('create')} className="btn-primary" style={{ padding: '0.85rem 1.5rem', fontSize: '0.95rem' }}>
-                    <PlusCircle style={{ width: '20px', height: '20px' }} /> Create Surplus Donation
-                  </button>
                 </div>
 
-                {/* SUPPLIER DASHBOARD DEFAULT VIEW: SIDE-BY-SIDE GRID */}
-                {flowStep === 'dashboard' && (
-                  <div>
-                    {/* LIVE REAL-TIME LOGISTICS TRACKING CARD FOR ACCEPTED RESCUE ORDERS */}
-                    {historyLogs.find((l) => l.type === 'ACCEPTED') && (
-                      <LiveLogisticsTracker log={historyLogs.find((l) => l.type === 'ACCEPTED')} />
-                    )}
-
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(420px, 1fr))', gap: '2rem', alignItems: 'start' }}>
-                    {/* LEFT COLUMN: CREATE SURPLUS FOOD DONATION CARD */}
-                    <div
-                      className="glass-panel"
-                      style={{
-                        padding: '2.5rem',
-                        background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
-                        border: '2px dashed var(--primary)',
-                        textAlign: 'center',
-                        boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)'
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '64px',
-                          height: '64px',
-                          borderRadius: '20px',
-                          background: '#d1fae5',
-                          color: '#047857',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          margin: '0 auto 1.25rem'
-                        }}
-                      >
-                        <PlusCircle style={{ width: '36px', height: '36px' }} />
-                      </div>
-
-                      <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.5rem' }}>
-                        Create Surplus Food Donation
-                      </h3>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.925rem', margin: '0 auto 1.75rem', lineHeight: '1.6' }}>
-                        Post surplus food quantity and usable window to immediately calculate spoilage urgency and broadcast dispatch offers to nearby verified candidate shelters.
-                      </p>
-
-                      <button
-                        onClick={() => setFlowStep('create')}
-                        className="btn-primary"
-                        style={{ width: '100%', justifyContent: 'center', fontSize: '1.05rem', padding: '1rem 1.5rem', boxShadow: '0 6px 20px rgba(5, 150, 105, 0.3)' }}
-                      >
-                        <PlusCircle style={{ width: '20px', height: '20px' }} /> Create & Post Surplus Food Now
-                      </button>
-                    </div>
-
-                    {/* RIGHT COLUMN: SUPPLIER CHRONOLOGICAL ACTIVITY STACK WITH DELETE BUTTON */}
-                    <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
-                      <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
-                        <Layers style={{ color: 'var(--primary)' }} /> Supplier Activity Stack (Persisted Stream)
-                      </h3>
-
-                      {historyLogs.length === 0 ? (
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical logs in stack. Click Create Surplus Donation to start!</p>
-                      ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', maxHeight: '520px', overflowY: 'auto', paddingRight: '0.25rem' }}>
-                          {historyLogs.map((log) => (
-                            <div
-                              key={log.id}
-                              className="glass-card"
-                              style={{
-                                padding: '1.25rem',
-                                borderLeft:
-                                  log.type === 'ACCEPTED'
-                                    ? '4px solid #047857'
-                                    : log.type === 'DECLINED'
-                                    ? '4px solid #be123c'
-                                    : '4px solid #059669'
-                              }}
-                            >
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                <div>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                    <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
-                                      {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
-                                    </span>
-                                  </div>
-
-                                  <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
-                                    {log.quantity} {log.food_name}
-                                  </h4>
-                                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                                    Target NGO: <strong>{log.ngo_name}</strong>
-                                  </p>
-
-                                  {log.type === 'ACCEPTED' && (
-                                    <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                                        <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
-                                        <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
-                                      </div>
-
-                                      <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                        <div style={{ color: '#047857', fontWeight: '700' }}>
-                                          🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
-                                        </div>
-                                        <div style={{ color: '#059669', fontWeight: '700' }}>
-                                          🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
-                                        </div>
-                                        <div style={{ color: '#0d9488', fontWeight: '600' }}>
-                                          ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
-                                        </div>
-                                      </div>
-                                    </div>
-                                  )}
-
-                                  {log.type !== 'ACCEPTED' && (
-                                    <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
-                                      {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </p>
-                                  )}
-                                </div>
-
-                                <button
-                                  onClick={(e) => handleDeleteHistoryLog(log.id, e)}
-                                  title="Delete history entry"
-                                  style={{
-                                    background: '#ffe4e6',
-                                    color: '#be123c',
-                                    border: '1px solid #fecdd3',
-                                    borderRadius: '8px',
-                                    padding: '0.4rem 0.6rem',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer'
-                                  }}
-                                >
-                                  <Trash2 style={{ width: '15px', height: '15px' }} />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-                {/* CREATE SURPLUS DONATION FORM */}
-                {flowStep === 'create' && (
-                  <div className="glass-panel" style={{ padding: '2.5rem', maxWidth: '680px', margin: '0 auto', background: '#ffffff' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
-                      <div
-                        style={{
-                          width: '42px',
-                          height: '42px',
-                          borderRadius: '12px',
-                          background: '#d1fae5',
-                          color: '#047857',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}
-                      >
-                        <PlusCircle style={{ width: '24px', height: '24px' }} />
-                      </div>
-                      <div>
-                        <h3 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#042f1a' }}>
-                          Create Surplus Food Donation
-                        </h3>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                          Enter surplus food details to calculate urgency & rank candidate NGOs.
-                        </p>
-                      </div>
-                    </div>
-
-                    <form onSubmit={handleStartAnalysis} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
-                          Supplier / Establishment Name
-                        </label>
-                        <input
-                          type="text"
-                          value={supplierName}
-                          onChange={(e) => setSupplierName(e.target.value)}
-                          placeholder="e.g. Grand Horizon Restaurant"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '0.85rem 1rem',
-                            borderRadius: 'var(--radius-md)',
-                            background: '#ffffff',
-                            border: '1px solid rgba(16, 185, 129, 0.3)',
-                            color: '#111827',
-                            fontSize: '0.95rem'
-                          }}
-                        />
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
-                          Food Item Name & Details
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.food_name}
-                          onChange={(e) => setFormData({ ...formData, food_name: e.target.value })}
-                          placeholder="e.g. 80 Packed Biryani Boxes / 100 Rice Meals"
-                          required
-                          style={{
-                            width: '100%',
-                            padding: '0.85rem 1rem',
-                            borderRadius: 'var(--radius-md)',
-                            background: '#ffffff',
-                            border: '1px solid rgba(16, 185, 129, 0.3)',
-                            color: '#111827',
-                            fontSize: '0.95rem'
-                          }}
-                        />
-                      </div>
-
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
-                            Quantity (Meals / Boxes)
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            value={formData.quantity}
-                            onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                            required
-                            style={{
-                              width: '100%',
-                              padding: '0.85rem 1rem',
-                              borderRadius: 'var(--radius-md)',
-                              background: '#ffffff',
-                              border: '1px solid rgba(16, 185, 129, 0.3)',
-                              color: '#111827',
-                              fontSize: '0.95rem'
-                            }}
-                          />
-                        </div>
-
-                        <div>
-                          <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
-                            Estimated Safe Window (Hours)
-                          </label>
-                          <input
-                            type="number"
-                            min="1"
-                            max="24"
-                            value={formData.usable_hours}
-                            onChange={(e) => setFormData({ ...formData, usable_hours: e.target.value })}
-                            required
-                            style={{
-                              width: '100%',
-                              padding: '0.85rem 1rem',
-                              borderRadius: 'var(--radius-md)',
-                              background: '#ffffff',
-                              border: '1px solid rgba(16, 185, 129, 0.3)',
-                              color: '#111827',
-                              fontSize: '0.95rem'
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div>
-                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
-                          Food Category
-                        </label>
-                        <select
-                          value={formData.food_type}
-                          onChange={(e) => setFormData({ ...formData, food_type: e.target.value })}
-                          style={{
-                            width: '100%',
-                            padding: '0.85rem 1rem',
-                            borderRadius: 'var(--radius-md)',
-                            background: '#ffffff',
-                            border: '1px solid rgba(16, 185, 129, 0.3)',
-                            color: '#111827',
-                            fontSize: '0.95rem'
-                          }}
-                        >
-                          <option value="VEGETARIAN">Vegetarian Prepared Meals</option>
-                          <option value="NON_VEGETARIAN">Non-Vegetarian Prepared Meals</option>
-                          <option value="BAKERY">Bakery & Bread Items</option>
-                          <option value="PACKAGED">Packaged Dry Rations</option>
-                        </select>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                        <button type="button" onClick={() => setFlowStep('dashboard')} className="btn-secondary" style={{ flex: 1 }}>
-                          Cancel
-                        </button>
-                        <button type="submit" className="btn-primary" style={{ flex: 2, justifyContent: 'center', fontSize: '1rem' }}>
-                          Analyze with AI & Rank NGOs <ChevronRight style={{ width: '18px', height: '18px' }} />
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-
-                {/* AI ANALYSIS ANIMATION */}
-                {flowStep === 'analyzing' && (
+                {/* TWO-COLUMN LAYOUT: LEFT SIDEBAR NAVIGATION & MAIN CONTENT */}
+                <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '2rem', alignItems: 'start' }}>
+                  {/* LEFT SIDEBAR NAVIGATION OPTIONS */}
                   <div
                     className="glass-panel"
                     style={{
-                      padding: '3.5rem 2rem',
-                      textAlign: 'center',
-                      maxWidth: '600px',
-                      margin: '0 auto',
+                      padding: '1.25rem',
+                      background: '#ffffff',
                       display: 'flex',
                       flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: '1.5rem',
-                      background: '#ffffff'
+                      gap: '0.75rem',
+                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
+                      position: 'sticky',
+                      top: '90px'
                     }}
                   >
-                    <div style={{ position: 'relative' }}>
-                      <div
-                        className="animate-spin-slow"
-                        style={{
-                          width: '80px',
-                          height: '80px',
-                          borderRadius: '50%',
-                          border: '3px solid transparent',
-                          borderTopColor: 'var(--primary)',
-                          borderRightColor: '#10b981'
-                        }}
-                      />
-                      <Sparkles
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          transform: 'translate(-50%, -50%)',
-                          color: 'var(--primary)',
-                          width: '32px',
-                          height: '32px'
-                        }}
-                      />
-                    </div>
+                    <p style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>
+                      Supplier Navigation
+                    </p>
 
-                    <div>
-                      <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#042f1a' }} className="gradient-text">
-                        🤖 AI Agent Analyzing Donation...
-                      </h2>
-                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                        Executing NGO Matching Skill for <strong>{formData.quantity} {formData.food_name}</strong>...
-                      </p>
-                    </div>
+                    <button
+                      onClick={() => {
+                        setSupplierSubTab('create');
+                        setFlowStep('dashboard');
+                      }}
+                      className={supplierSubTab === 'create' ? 'btn-primary' : 'btn-secondary'}
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        padding: '0.85rem 1.1rem',
+                        fontSize: '0.925rem',
+                        fontWeight: '700',
+                        border: supplierSubTab === 'create' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                      }}
+                    >
+                      <PlusCircle style={{ width: '18px', height: '18px' }} /> Create Surplus Donation
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setSupplierSubTab('history');
+                        setFlowStep('dashboard');
+                      }}
+                      className={supplierSubTab === 'history' ? 'btn-primary' : 'btn-secondary'}
+                      style={{
+                        width: '100%',
+                        justifyContent: 'flex-start',
+                        padding: '0.85rem 1.1rem',
+                        fontSize: '0.925rem',
+                        fontWeight: '700',
+                        border: supplierSubTab === 'history' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                      }}
+                    >
+                      <Layers style={{ width: '18px', height: '18px' }} /> Supplier Activity Stack
+                    </button>
                   </div>
-                )}
 
-                {/* NGO SELECTION & REQUEST BROADCASTING */}
-                {flowStep === 'recommended' && analysisResult && (
-                  <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                  {/* RIGHT MAIN CONTENT AREA */}
+                  <div>
+                    {/* VIEW 1: CREATE SURPLUS DONATION SUBTAB */}
+                    {supplierSubTab === 'create' && (
                       <div>
-                        <span className="badge badge-success">🎯 AI Matching Skill Execution Complete</span>
-                        <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginTop: '0.3rem', color: '#042f1a' }}>
-                          Select Target NGOs for Request Broadcast
-                        </h2>
-                        <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                          Sending <strong>{formData.quantity} {formData.food_name}</strong>. Check candidate NGOs below.
-                        </p>
-                      </div>
+                        {/* DEFAULT STEP: SHOW REAL-TIME LOGISTICS TRACKING + CREATE SURPLUS FOOD DONATION CARD */}
+                        {flowStep === 'dashboard' && (
+                          <div>
+                            {/* LIVE REAL-TIME LOGISTICS TRACKING CARD FOR ACCEPTED RESCUE ORDERS */}
+                            {activeAcceptedLog && <LiveLogisticsTracker log={activeAcceptedLog} />}
 
-                      <button
-                        onClick={handleBroadcastRequests}
-                        disabled={isSubmitting || selectedNgoIds.length === 0}
-                        className="btn-primary"
-                        style={{ padding: '0.85rem 1.75rem', fontSize: '1rem' }}
-                      >
-                        <Send style={{ width: '18px', height: '18px' }} /> Broadcast to ({selectedNgoIds.length}) Selected NGOs
-                      </button>
-                    </div>
-
-                    {/* TOP RECOMMENDED NGO CARD */}
-                    {analysisResult.recommendedNgo && (
-                      <div
-                        className="glass-card"
-                        style={{
-                          padding: '1.5rem',
-                          marginBottom: '1.5rem',
-                          border: selectedNgoIds.includes(analysisResult.recommendedNgo.id)
-                            ? '2px solid var(--primary)'
-                            : '1px solid rgba(16, 185, 129, 0.2)',
-                          boxShadow: selectedNgoIds.includes(analysisResult.recommendedNgo.id) ? '0 0 25px rgba(5, 150, 105, 0.15)' : 'none'
-                        }}
-                      >
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                            {/* CREATE SURPLUS FOOD DONATION CARD */}
                             <div
-                              onClick={() => toggleNgoSelection(analysisResult.recommendedNgo.id)}
-                              style={{ cursor: 'pointer', marginTop: '0.2rem' }}
+                              className="glass-panel"
+                              style={{
+                                padding: '2.75rem 2rem',
+                                background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
+                                border: '2px dashed var(--primary)',
+                                textAlign: 'center',
+                                boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)'
+                              }}
                             >
-                              {selectedNgoIds.includes(analysisResult.recommendedNgo.id) ? (
-                                <CheckSquare style={{ color: 'var(--primary)', width: '24px', height: '24px' }} />
-                              ) : (
-                                <Square style={{ color: 'var(--text-muted)', width: '24px', height: '24px' }} />
-                              )}
-                            </div>
-
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                <span className="badge badge-success">⭐ Top AI Recommendation</span>
-                                <span style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--primary)' }}>
-                                  {analysisResult.recommendedNgo.matchScore}% Match
-                                </span>
+                              <div
+                                style={{
+                                  width: '64px',
+                                  height: '64px',
+                                  borderRadius: '20px',
+                                  background: '#d1fae5',
+                                  color: '#047857',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  margin: '0 auto 1.25rem'
+                                }}
+                              >
+                                <PlusCircle style={{ width: '36px', height: '36px' }} />
                               </div>
 
-                              <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginTop: '0.3rem', color: '#042f1a' }}>
-                                {analysisResult.recommendedNgo.name}
+                              <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.5rem' }}>
+                                Create Surplus Food Donation
                               </h3>
-
-                              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.3rem', marginTop: '0.2rem' }}>
-                                <MapPin style={{ width: '14px', height: '14px', color: '#059669' }} />
-                                {analysisResult.recommendedNgo.distanceKm} km away • Demand: {analysisResult.recommendedNgo.demand} meals • Capacity: {analysisResult.recommendedNgo.capacity} meals
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '620px', margin: '0 auto 1.75rem', lineHeight: '1.6' }}>
+                                Post surplus food quantity and usable window to immediately calculate spoilage urgency and broadcast dispatch offers to nearby verified candidate shelters.
                               </p>
 
-                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
-                                {(analysisResult.recommendedNgo.rationale || []).map((r, i) => (
-                                  <span key={i} style={{ fontSize: '0.75rem', background: '#d1fae5', color: '#047857', padding: '0.2rem 0.6rem', borderRadius: '4px', fontWeight: '600' }}>
-                                    {r}
-                                  </span>
-                                ))}
-                              </div>
+                              <button
+                                onClick={() => setFlowStep('create')}
+                                className="btn-primary"
+                                style={{ width: '100%', maxWidth: '380px', margin: '0 auto', justifyContent: 'center', fontSize: '1.05rem', padding: '1rem 1.5rem', boxShadow: '0 6px 20px rgba(5, 150, 105, 0.3)' }}
+                              >
+                                <PlusCircle style={{ width: '20px', height: '20px' }} /> Create & Post Surplus Food Now
+                              </button>
                             </div>
                           </div>
-                        </div>
-                      </div>
-                    )}
+                        )}
 
-                    {/* ALTERNATIVE CANDIDATE NGOS LIST */}
-                    <h3 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1rem', color: '#042f1a' }}>
-                      Other Eligible Candidate NGOs (Manual Multi-Selection)
-                    </h3>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                      {(analysisResult.alternativeNgos || []).map((ngo) => {
-                        const isSelected = selectedNgoIds.includes(ngo.id);
-                        return (
-                          <div
-                            key={ngo.id}
-                            className="glass-card"
-                            style={{
-                              padding: '1.25rem',
-                              display: 'flex',
-                              justify: 'space-between',
-                              alignItems: 'center',
-                              border: isSelected ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)',
-                              background: isSelected ? '#ecfdf5' : '#ffffff'
-                            }}
-                          >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                              <div onClick={() => toggleNgoSelection(ngo.id)} style={{ cursor: 'pointer' }}>
-                                {isSelected ? (
-                                  <CheckSquare style={{ color: '#059669', width: '22px', height: '22px' }} />
-                                ) : (
-                                  <Square style={{ color: 'var(--text-muted)', width: '22px', height: '22px' }} />
-                                )}
+                        {/* CREATE SURPLUS DONATION FORM */}
+                        {flowStep === 'create' && (
+                          <div className="glass-panel" style={{ padding: '2.5rem', maxWidth: '680px', margin: '0 auto', background: '#ffffff' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                              <div
+                                style={{
+                                  width: '42px',
+                                  height: '42px',
+                                  borderRadius: '12px',
+                                  background: '#d1fae5',
+                                  color: '#047857',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <PlusCircle style={{ width: '24px', height: '24px' }} />
                               </div>
-
                               <div>
-                                <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: '#042f1a' }}>{ngo.name}</h4>
-                                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  {ngo.distanceKm} km away • Daily Demand: {ngo.demand} meals • Storage Capacity: {ngo.capacity} meals
+                                <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#042f1a' }}>
+                                  Post Surplus Food Offering
+                                </h3>
+                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                  Fill in quantity and preparation time for immediate AI spoilage assessment.
                                 </p>
                               </div>
                             </div>
 
-                            <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#059669' }}>
-                              {ngo.matchScore}% Score
-                            </span>
+                            <form onSubmit={handleStartAnalysis} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
+                                  Food Item Description *
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. 150 Meals of Veg Biryani & Paneer Gravy"
+                                  value={formData.food_name}
+                                  onChange={(e) => setFormData({ ...formData, food_name: e.target.value })}
+                                  required
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.85rem 1rem',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                                    fontSize: '0.95rem',
+                                    background: '#ffffff'
+                                  }}
+                                />
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
+                                    Quantity (Meal Servings) *
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    placeholder="150"
+                                    value={formData.quantity}
+                                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                                    required
+                                    style={{
+                                      width: '100%',
+                                      padding: '0.85rem 1rem',
+                                      borderRadius: 'var(--radius-md)',
+                                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                                      fontSize: '0.95rem',
+                                      background: '#ffffff'
+                                    }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
+                                    Usable Window (Hours) *
+                                  </label>
+                                  <input
+                                    type="number"
+                                    min="1"
+                                    max="24"
+                                    placeholder="5"
+                                    value={formData.usable_hours}
+                                    onChange={(e) => setFormData({ ...formData, usable_hours: e.target.value })}
+                                    required
+                                    style={{
+                                      width: '100%',
+                                      padding: '0.85rem 1rem',
+                                      borderRadius: 'var(--radius-md)',
+                                      border: '1px solid rgba(16, 185, 129, 0.3)',
+                                      fontSize: '0.95rem',
+                                      background: '#ffffff'
+                                    }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div>
+                                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: '700', marginBottom: '0.4rem', color: '#374151' }}>
+                                  Food Classification *
+                                </label>
+                                <select
+                                  value={formData.food_type}
+                                  onChange={(e) => setFormData({ ...formData, food_type: e.target.value })}
+                                  style={{
+                                    width: '100%',
+                                    padding: '0.85rem 1rem',
+                                    borderRadius: 'var(--radius-md)',
+                                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                                    fontSize: '0.95rem',
+                                    background: '#ffffff'
+                                  }}
+                                >
+                                  <option value="VEGETARIAN">Vegetarian (Cooked Meals / Gravies)</option>
+                                  <option value="NON_VEGETARIAN">Non-Vegetarian (Poultry / Meat)</option>
+                                  <option value="PACKAGED">Packaged / Sealed Bakery Goods</option>
+                                </select>
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => setFlowStep('dashboard')}
+                                  className="btn-secondary"
+                                  style={{ flex: 1, justifyContent: 'center' }}
+                                >
+                                  Cancel
+                                </button>
+                                <button
+                                  type="submit"
+                                  disabled={isSubmitting}
+                                  className="btn-primary"
+                                  style={{ flex: 2, justifyContent: 'center' }}
+                                >
+                                  <Sparkles style={{ width: '18px', height: '18px' }} /> Execute AI Spoilage Analysis
+                                </button>
+                              </div>
+                            </form>
                           </div>
-                        );
-                      })}
-                    </div>
+                        )}
+
+                        {/* SPONTANEOUS SPONSORSHIP ANALYZING SCREEN */}
+                        {flowStep === 'analyzing' && (
+                          <div
+                            className="glass-panel"
+                            style={{
+                              padding: '4rem 2rem',
+                              textAlign: 'center',
+                              maxWidth: '680px',
+                              margin: '0 auto',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '1.5rem',
+                              background: '#ffffff'
+                            }}
+                          >
+                            <div style={{ position: 'relative' }}>
+                              <div
+                                className="animate-spin-slow"
+                                style={{
+                                  width: '80px',
+                                  height: '80px',
+                                  borderRadius: '50%',
+                                  border: '3px solid transparent',
+                                  borderTopColor: 'var(--primary)',
+                                  borderRightColor: '#10b981'
+                                }}
+                              />
+                              <Sparkles
+                                style={{
+                                  position: 'absolute',
+                                  top: '50%',
+                                  left: '50%',
+                                  transform: 'translate(-50%, -50%)',
+                                  color: 'var(--primary)',
+                                  width: '32px',
+                                  height: '32px'
+                                }}
+                              />
+                            </div>
+
+                            <div>
+                              <h2 style={{ fontSize: '1.4rem', fontWeight: '700', color: '#042f1a' }} className="gradient-text">
+                                🤖 AI Agent Analyzing Donation...
+                              </h2>
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>
+                                Executing NGO Matching Skill for <strong>{formData.quantity} {formData.food_name}</strong>...
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* NGO SELECTION & REQUEST BROADCASTING */}
+                        {flowStep === 'recommended' && analysisResult && (
+                          <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+                              <div>
+                                <span className="badge badge-success">🎯 AI Matching Skill Execution Complete</span>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: '800', marginTop: '0.3rem', color: '#042f1a' }}>
+                                  Select Target NGOs for Request Broadcast
+                                </h2>
+                                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+                                  Sending <strong>{formData.quantity} {formData.food_name}</strong>. Check candidate NGOs below.
+                                </p>
+                              </div>
+
+                              <button
+                                onClick={handleBroadcastRequests}
+                                disabled={isSubmitting || selectedNgoIds.length === 0}
+                                className="btn-primary"
+                                style={{ padding: '0.85rem 1.75rem', fontSize: '1rem' }}
+                              >
+                                <Send style={{ width: '18px', height: '18px' }} /> Broadcast to ({selectedNgoIds.length}) Selected NGOs
+                              </button>
+                            </div>
+
+                            {/* TOP RECOMMENDED NGO CARD */}
+                            {analysisResult.recommendedNgo && (
+                              <div
+                                className="glass-card"
+                                style={{
+                                  padding: '1.5rem',
+                                  marginBottom: '1.5rem',
+                                  border: selectedNgoIds.includes(analysisResult.recommendedNgo.id)
+                                    ? '2px solid var(--primary)'
+                                    : '1px solid rgba(16, 185, 129, 0.2)',
+                                  boxShadow: selectedNgoIds.includes(analysisResult.recommendedNgo.id) ? '0 0 25px rgba(5, 150, 105, 0.15)' : 'none'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+                                    <div
+                                      onClick={() => toggleNgoSelection(analysisResult.recommendedNgo.id)}
+                                      style={{ cursor: 'pointer', marginTop: '0.2rem' }}
+                                    >
+                                      {selectedNgoIds.includes(analysisResult.recommendedNgo.id) ? (
+                                        <CheckSquare style={{ color: 'var(--primary)', width: '24px', height: '24px' }} />
+                                      ) : (
+                                        <Square style={{ color: 'var(--text-muted)', width: '24px', height: '24px' }} />
+                                      )}
+                                    </div>
+
+                                    <div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                        <span className="badge badge-success">⭐ Top AI Recommendation</span>
+                                        <span style={{ fontSize: '0.9rem', fontWeight: '800', color: 'var(--primary)' }}>
+                                          {analysisResult.recommendedNgo.matchScore}% Match
+                                        </span>
+                                      </div>
+
+                                      <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginTop: '0.3rem', color: '#042f1a' }}>
+                                        {analysisResult.recommendedNgo.name}
+                                      </h3>
+                                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                                        📍 {analysisResult.recommendedNgo.address} ({analysisResult.recommendedNgo.distanceKm} km away)
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* OTHER NGO CANDIDATES */}
+                            <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1rem', color: '#042f1a' }}>
+                              Other Verified Shelter Candidates ({analysisResult.ngos.length})
+                            </h4>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                              {analysisResult.ngos.map((ngo) => {
+                                const isSelected = selectedNgoIds.includes(ngo.id);
+                                return (
+                                  <div
+                                    key={ngo.id}
+                                    className="glass-card"
+                                    style={{
+                                      padding: '1.25rem',
+                                      display: 'flex',
+                                      justify: 'space-between',
+                                      alignItems: 'center',
+                                      border: isSelected ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)',
+                                      background: isSelected ? '#ecfdf5' : '#ffffff'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                      <div onClick={() => toggleNgoSelection(ngo.id)} style={{ cursor: 'pointer' }}>
+                                        {isSelected ? (
+                                          <CheckSquare style={{ color: '#059669', width: '22px', height: '22px' }} />
+                                        ) : (
+                                          <Square style={{ color: 'var(--text-muted)', width: '22px', height: '22px' }} />
+                                        )}
+                                      </div>
+
+                                      <div>
+                                        <h4 style={{ fontWeight: '700', fontSize: '1.1rem', color: '#042f1a' }}>{ngo.name}</h4>
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                          {ngo.distanceKm} km away • Daily Demand: {ngo.demand} meals • Storage Capacity: {ngo.capacity} meals
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    <span style={{ fontSize: '0.95rem', fontWeight: '800', color: '#059669' }}>
+                                      {ngo.matchScore}% Score
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* BROADCAST SENT CONFIRMATION */}
+                        {flowStep === 'broadcast_sent' && (
+                          <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '750px', margin: '0 auto', background: '#ffffff' }}>
+                            <div
+                              style={{
+                                width: '60px',
+                                height: '60px',
+                                borderRadius: '50%',
+                                background: '#d1fae5',
+                                color: '#047857',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                margin: '0 auto 1.25rem'
+                              }}
+                            >
+                              <Send style={{ width: '30px', height: '30px' }} />
+                            </div>
+
+                            <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#042f1a' }} className="gradient-text">
+                              📡 Donation Request Broadcasted!
+                            </h2>
+                            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.4rem', marginBottom: '2rem' }}>
+                              Sent request for <strong>{formData.quantity} {formData.food_name}</strong> to {selectedNgoIds.length} selected NGO shelters.
+                            </p>
+
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                              <button onClick={() => setUserRole('ngo')} className="btn-primary">
+                                Switch to NGO Dashboard <ChevronRight style={{ width: '16px', height: '16px' }} />
+                              </button>
+                              <button onClick={() => setFlowStep('dashboard')} className="btn-secondary">
+                                Return to Dashboard
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* VIEW 2: SUPPLIER ACTIVITY STACK (HISTORY) SUBTAB */}
+                    {supplierSubTab === 'history' && (
+                      <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
+                        <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
+                          <Layers style={{ color: 'var(--primary)' }} /> Supplier Activity Stack (Persisted Stream)
+                        </h3>
+
+                        {historyLogs.length === 0 ? (
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decision logs in stack. Click "Create Surplus Donation" in the menu to post your first offering!</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                            {historyLogs.map((log) => (
+                              <div
+                                key={log.id}
+                                className="glass-card"
+                                style={{
+                                  padding: '1.25rem',
+                                  borderLeft:
+                                    log.type === 'ACCEPTED'
+                                      ? '4px solid #047857'
+                                      : log.type === 'DECLINED'
+                                      ? '4px solid #be123c'
+                                      : '4px solid #059669'
+                                }}
+                              >
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                  <div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                      <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
+                                        {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
+                                      </span>
+                                    </div>
+
+                                    <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
+                                      {log.quantity} {log.food_name}
+                                    </h4>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                      Target NGO: <strong>{log.ngo_name}</strong>
+                                    </p>
+
+                                    {log.type === 'ACCEPTED' && (
+                                      <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                          <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
+                                          <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
+                                        </div>
+
+                                        <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                          <div style={{ color: '#047857', fontWeight: '700' }}>
+                                            🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
+                                          </div>
+                                          <div style={{ color: '#059669', fontWeight: '700' }}>
+                                            🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
+                                          </div>
+                                          <div style={{ color: '#0d9488', fontWeight: '600' }}>
+                                            ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {log.type !== 'ACCEPTED' && (
+                                      <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
+                                        {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                      </p>
+                                    )}
+                                  </div>
+
+                                  <button
+                                    onClick={(e) => handleDeleteHistoryLog(log.id, e)}
+                                    title="Delete history entry"
+                                    style={{
+                                      background: '#ffe4e6',
+                                      color: '#be123c',
+                                      border: '1px solid #fecdd3',
+                                      borderRadius: '8px',
+                                      padding: '0.4rem 0.6rem',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      cursor: 'pointer'
+                                    }}
+                                  >
+                                    <Trash2 style={{ width: '15px', height: '15px' }} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
-
-                {/* BROADCAST SENT CONFIRMATION */}
-                {flowStep === 'broadcast_sent' && (
-                  <div className="glass-panel" style={{ padding: '2.5rem', textAlign: 'center', maxWidth: '750px', margin: '0 auto', background: '#ffffff' }}>
-                    <div
-                      style={{
-                        width: '60px',
-                        height: '60px',
-                        borderRadius: '50%',
-                        background: '#d1fae5',
-                        color: '#047857',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 1.25rem'
-                      }}
-                    >
-                      <Send style={{ width: '30px', height: '30px' }} />
-                    </div>
-
-                    <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#042f1a' }} className="gradient-text">
-                      📡 Donation Request Broadcasted!
-                    </h2>
-                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.4rem', marginBottom: '2rem' }}>
-                      Sent request for <strong>{formData.quantity} {formData.food_name}</strong> to {selectedNgoIds.length} selected NGO shelters.
-                    </p>
-
-                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                      <button onClick={() => setUserRole('ngo')} className="btn-primary">
-                        Switch to NGO Dashboard <ChevronRight style={{ width: '16px', height: '16px' }} />
-                      </button>
-                      <button onClick={() => setFlowStep('dashboard')} className="btn-secondary">
-                        Return to Dashboard
-                      </button>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             )}
-
             {/* NGO SHELTER DASHBOARD */}
             {userRole === 'ngo' && (
               <div>
                 {/* LIVE LOGISTICS TRACKER FOR ACTIVE ACCEPTED RESCUE ORDER FOR THIS NGO */}
-                {historyLogs.find((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED') && (
-                  <LiveLogisticsTracker log={historyLogs.find((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED')} />
-                )}
+                {activeNgoAcceptedLog && <LiveLogisticsTracker log={activeNgoAcceptedLog} />}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <h2 style={{ fontSize: '1.6rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
