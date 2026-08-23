@@ -21,7 +21,7 @@ FoodBridge is an AI-driven surplus food rescue and distribution engine. It conne
                     ┌─────────────────────┐
                     │      FoodBridge     │
                     │      Frontend       │
-                    │   React / Next.js   │
+                    │    React (Vite)     │
                     └──────────┬──────────┘
                                │
                          REST / JSON
