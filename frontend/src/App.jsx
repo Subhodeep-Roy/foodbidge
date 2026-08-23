@@ -774,6 +774,7 @@ export default function App() {
   };
 
   const openSupplierLogin = () => {
+    setActiveTab('main');
     setAuthView('supplier_login');
     setLoginSelectedSupplier(selectedSupplierUser || 'sup_1');
     setPasswordInput('');
@@ -782,6 +783,7 @@ export default function App() {
   };
 
   const openNgoLogin = () => {
+    setActiveTab('main');
     setAuthView('ngo_login');
     setLoginSelectedNgo(selectedNgoUser || 'ngo_101');
     setPasswordInput('');
@@ -899,11 +901,14 @@ export default function App() {
             {/* AUXILIARY NAVIGATION TABS */}
             <nav style={{ display: 'flex', gap: '0.35rem' }}>
               <button
-                onClick={() => setActiveTab('ngos')}
-                className={activeTab === 'ngos' ? 'btn-primary' : 'btn-secondary'}
+                onClick={() => {
+                  setActiveTab('ngos');
+                  setAuthView(null);
+                }}
+                className={activeTab === 'ngos' && !authView ? 'btn-primary' : 'btn-secondary'}
                 style={{ fontSize: '0.85rem', padding: '0.65rem 1rem' }}
               >
-                NGO Directory
+                NGO signed
               </button>
             </nav>
 
@@ -1102,10 +1107,26 @@ export default function App() {
                   >
                     {suppliersList.map((sup) => (
                       <option key={sup.id} value={sup.id}>
-                        🍽️ {sup.name} ({sup.address})
+                        🍽️ {sup.name}
                       </option>
                     ))}
                   </select>
+
+                  {/* FULL ADDRESS DISPLAYED BELOW NAME WITHIN BRACKETS */}
+                  {(() => {
+                    const selSup = suppliersList.find((s) => s.id === loginSelectedSupplier) || suppliersList[0];
+                    if (!selSup) return null;
+                    return (
+                      <div style={{ marginTop: '0.6rem', padding: '0.65rem 0.9rem', background: '#ecfdf5', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
+                        <div style={{ fontWeight: '800', color: '#042f1a', fontSize: '0.95rem' }}>
+                          🍽️ {selSup.name}
+                        </div>
+                        <div style={{ color: '#047857', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: '600', lineHeight: '1.4' }}>
+                          ({selSup.address})
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* ENTER PASSWORD INPUT */}
@@ -1116,7 +1137,7 @@ export default function App() {
                   <div style={{ position: 'relative' }}>
                     <input
                       type={showPasswordText ? 'text' : 'password'}
-                      placeholder="Enter password (default: 1234)"
+                      placeholder="XXXXXXXXX"
                       value={passwordInput}
                       onChange={(e) => {
                         setPasswordInput(e.target.value);
@@ -1130,7 +1151,8 @@ export default function App() {
                         borderRadius: 'var(--radius-md)',
                         border: passwordError ? '2px solid #be123c' : '1px solid #d1d5db',
                         fontSize: '0.95rem',
-                        fontWeight: '600'
+                        fontWeight: '600',
+                        letterSpacing: showPasswordText ? 'normal' : '0.15em'
                       }}
                     />
                     <button
@@ -1277,10 +1299,27 @@ export default function App() {
                   >
                     {ngoList.map((ngo) => (
                       <option key={ngo.id} value={ngo.id}>
-                        🏢 {ngo.organization_name || ngo.name} ({ngo.address})
+                        🏢 {ngo.organization_name || ngo.name}
                       </option>
                     ))}
                   </select>
+
+                  {/* FULL ADDRESS DISPLAYED BELOW NAME WITHIN BRACKETS */}
+                  {(() => {
+                    const selNgo = ngoList.find((n) => n.id === loginSelectedNgo) || ngoList[0];
+                    if (!selNgo) return null;
+                    const ngoName = selNgo.organization_name || selNgo.name;
+                    return (
+                      <div style={{ marginTop: '0.6rem', padding: '0.65rem 0.9rem', background: '#f0fdfa', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(13, 148, 136, 0.3)' }}>
+                        <div style={{ fontWeight: '800', color: '#042f1a', fontSize: '0.95rem' }}>
+                          🏢 {ngoName}
+                        </div>
+                        <div style={{ color: '#0f766e', fontSize: '0.85rem', marginTop: '0.25rem', fontWeight: '600', lineHeight: '1.4' }}>
+                          ({selNgo.address})
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
 
                 {/* ENTER PASSWORD INPUT */}
@@ -1291,7 +1330,7 @@ export default function App() {
                   <div style={{ position: 'relative' }}>
                     <input
                       type={showPasswordText ? 'text' : 'password'}
-                      placeholder="Enter password (default: 1234)"
+                      placeholder="XXXXXXXXX"
                       value={passwordInput}
                       onChange={(e) => {
                         setPasswordInput(e.target.value);
@@ -1305,7 +1344,8 @@ export default function App() {
                         borderRadius: 'var(--radius-md)',
                         border: passwordError ? '2px solid #be123c' : '1px solid #d1d5db',
                         fontSize: '0.95rem',
-                        fontWeight: '600'
+                        fontWeight: '600',
+                        letterSpacing: showPasswordText ? 'normal' : '0.15em'
                       }}
                     />
                     <button
@@ -1843,58 +1883,20 @@ export default function App() {
                     }}
                   >
                     <div style={{ background: '#f4fbf7', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.3)', marginBottom: '0.5rem' }}>
-                      <label style={{ fontSize: '0.725rem', fontWeight: '800', color: '#047857', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>
-                        Active Restaurant Persona
-                      </label>
-                      <select
-                        value={selectedSupplierUser}
-                        onChange={(e) => setSelectedSupplierUser(e.target.value)}
-                        style={{
-                          width: '100%',
-                          padding: '0.5rem 0.6rem',
-                          borderRadius: 'var(--radius-sm)',
-                          border: '1px solid var(--primary)',
-                          fontWeight: '700',
-                          color: '#042f1a',
-                          fontSize: '0.85rem',
-                          background: '#ffffff',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {suppliersList.map((sup) => (
-                          <option key={sup.id} value={sup.id}>
-                            🍽️ {sup.name}
-                          </option>
-                        ))}
-                      </select>
-                      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.35rem', lineHeight: '1.2' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                        <label style={{ fontSize: '0.725rem', fontWeight: '800', color: '#047857', textTransform: 'uppercase' }}>
+                          Logged In Restaurant
+                        </label>
+                        <span style={{ fontSize: '0.65rem', background: '#d1fae5', color: '#047857', padding: '0.15rem 0.45rem', borderRadius: '10px', fontWeight: '800' }}>
+                          VERIFIED
+                        </span>
+                      </div>
+                      <div style={{ fontWeight: '800', color: '#042f1a', fontSize: '0.925rem', margin: '0.25rem 0 0.15rem' }}>
+                        🍽️ {supplierName}
+                      </div>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', lineHeight: '1.3' }}>
                         📍 {currentSupplier.address}
                       </p>
-
-                      <button
-                        onClick={() => {
-                          setShowAddSupplierForm(!showAddSupplierForm);
-                          setSupplierSubTab('create');
-                        }}
-                        style={{
-                          width: '100%',
-                          marginTop: '0.6rem',
-                          padding: '0.45rem 0.6rem',
-                          fontSize: '0.75rem',
-                          fontWeight: '700',
-                          color: '#047857',
-                          background: '#d1fae5',
-                          border: '1px solid #a7f3d0',
-                          borderRadius: '6px',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.3rem'
-                        }}
-                      >
-                        <PlusCircle style={{ width: '13px', height: '13px' }} /> {showAddSupplierForm ? 'Close Registration' : '+ Add Restaurant'}
-                      </button>
                     </div>
 
                     <p style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>
@@ -2549,32 +2551,10 @@ export default function App() {
                     </p>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: '600' }}>Active Shelter View:</span>
-                    <select
-                      value={selectedNgoUser}
-                      onChange={(e) => {
-                        setSelectedNgoUser(e.target.value);
-                        setNgoNotification(null);
-                      }}
-                      style={{
-                        padding: '0.55rem 0.9rem',
-                        borderRadius: 'var(--radius-md)',
-                        background: '#ffffff',
-                        border: '1px solid rgba(16, 185, 129, 0.3)',
-                        color: '#042f1a',
-                        fontSize: '0.88rem',
-                        fontWeight: '700',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                        maxWidth: '280px'
-                      }}
-                    >
-                      {ngoList.map((ngo) => (
-                        <option key={ngo.id} value={ngo.id}>
-                          {ngo.organization_name || ngo.name}
-                        </option>
-                      ))}
-                    </select>
+                  <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', background: '#f0fdfa', padding: '0.5rem 0.9rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(13, 148, 136, 0.3)' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#0f766e', fontWeight: '800', textTransform: 'uppercase' }}>Logged In:</span>
+                    <span style={{ fontSize: '0.9rem', color: '#042f1a', fontWeight: '800' }}>🏢 {currentNgoName}</span>
+                    <span style={{ fontSize: '0.65rem', background: '#ccfbf1', color: '#0f766e', padding: '0.15rem 0.45rem', borderRadius: '10px', fontWeight: '800' }}>VERIFIED</span>
                   </div>
                 </div>
 
@@ -2891,8 +2871,8 @@ export default function App() {
           </div>
         )}
 
-        {/* TAB 2: NGO DIRECTORY WITH REGISTER NGO & REQUIRED DOCUMENTS FORM */}
-        {activeTab === 'ngos' && (
+        {/* TAB 2: NGO SIGNED / DIRECTORY WITH REGISTER NGO & REQUIRED DOCUMENTS FORM */}
+        {!authView && activeTab === 'ngos' && (
           <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
               <div>
