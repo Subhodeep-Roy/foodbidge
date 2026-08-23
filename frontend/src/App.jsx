@@ -1392,12 +1392,9 @@ export default function App() {
                     {/* VIEW 1: CREATE SURPLUS DONATION SUBTAB */}
                     {supplierSubTab === 'create' && (
                       <div>
-                        {/* DEFAULT STEP: SHOW REAL-TIME LOGISTICS TRACKING + CREATE SURPLUS FOOD DONATION CARD */}
+                        {/* DEFAULT STEP: SHOW CREATE SURPLUS FOOD DONATION CARD + REAL-TIME LOGISTICS TRACKING */}
                         {flowStep === 'dashboard' && (
                           <div>
-                            {/* LIVE REAL-TIME LOGISTICS TRACKING CARD FOR ACCEPTED RESCUE ORDERS */}
-                            {activeAcceptedLog && <LiveLogisticsTracker log={activeAcceptedLog} />}
-
                             {/* CREATE SURPLUS FOOD DONATION CARD */}
                             <div
                               className="glass-panel"
@@ -1406,7 +1403,8 @@ export default function App() {
                                 background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
                                 border: '2px dashed var(--primary)',
                                 textAlign: 'center',
-                                boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)'
+                                boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)',
+                                marginBottom: activeAcceptedLog ? '2rem' : '0'
                               }}
                             >
                               <div
@@ -1440,6 +1438,9 @@ export default function App() {
                                 <PlusCircle style={{ width: '20px', height: '20px' }} /> Create & Post Surplus Food Now
                               </button>
                             </div>
+
+                            {/* LIVE REAL-TIME LOGISTICS TRACKING CARD FOR ACCEPTED RESCUE ORDERS */}
+                            {activeAcceptedLog && <LiveLogisticsTracker log={activeAcceptedLog} />}
                           </div>
                         )}
 
