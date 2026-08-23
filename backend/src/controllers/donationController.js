@@ -264,7 +264,7 @@ exports.getDonations = (req, res) => {
 
 exports.createDonation = (req, res) => {
   loadData();
-  const { food_name, quantity, food_type, usable_hours, latitude, longitude, supplier_name } = req.body;
+  const { food_name, quantity, food_type, usable_hours, latitude, longitude, supplier_name, supplier_id } = req.body;
 
   if (!food_name || !quantity) {
     return res.status(400).json({ success: false, message: 'food_name and quantity are required' });
@@ -272,7 +272,7 @@ exports.createDonation = (req, res) => {
 
   const newDonation = {
     id: `don_${Date.now()}`,
-    supplier_id: 'sup_1',
+    supplier_id: supplier_id || 'sup_1',
     supplier_name: supplier_name || 'Grand Horizon Restaurant',
     food_name,
     quantity: Number(quantity),
@@ -297,7 +297,7 @@ exports.createDonation = (req, res) => {
   });
 };
 
-exports.getRecommendation = (req, res) => {
+exports.getRecommendation = async (req, res) => {
   loadData();
   const { id } = req.params;
   const donation = donations.find((d) => d.id === id) || donations[0];
@@ -306,13 +306,27 @@ exports.getRecommendation = (req, res) => {
     return res.status(404).json({ success: false, message: 'Donation not found' });
   }
 
-  const result = executeNgoMatchingSkill(donation, ngos);
-
-  res.json({
-    success: true,
-    donationId: donation.id,
-    ...result
-  });
+  try {
+    const result = await executeNgoMatchingSkill(donation, ngos);
+    res.json({
+      success: true,
+      donationId: donation.id,
+      ...result
+    });
+  } catch (err) {
+    if (err.code === 'AI_ENGINE_UNAVAILABLE') {
+      return res.status(503).json({
+        success: false,
+        error: 'AI_ENGINE_UNAVAILABLE',
+        message: 'The Python AI Matching Engine is not running. Please start it with: py -m uvicorn ai.main:app --port 8000',
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      error: 'AI_ENGINE_ERROR',
+      message: err.message
+    });
+  }
 };
 
 exports.broadcastRequest = (req, res) => {
@@ -339,6 +353,7 @@ exports.broadcastRequest = (req, res) => {
       existing = {
         id: `req_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
         donation_id: donation.id,
+        supplier_id: donation.supplier_id || 'sup_1',
         supplier_name: donation.supplier_name,
         food_name: donation.food_name,
         quantity: donation.quantity,
@@ -353,6 +368,8 @@ exports.broadcastRequest = (req, res) => {
       donationRequests.unshift(existing);
     } else {
       existing.status = 'PENDING';
+      existing.supplier_id = donation.supplier_id || existing.supplier_id || 'sup_1';
+      existing.supplier_name = donation.supplier_name || existing.supplier_name;
       existing.requested_at = new Date().toISOString();
     }
     createdRequests.push(existing);

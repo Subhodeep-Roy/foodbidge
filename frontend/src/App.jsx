@@ -332,6 +332,7 @@ export default function App() {
   const [ngoNotification, setNgoNotification] = useState(null);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dismissedDeclinedIds, setDismissedDeclinedIds] = useState([]);
 
   // Click-Outside Handler to close Login Menu
   useEffect(() => {
@@ -369,12 +370,16 @@ export default function App() {
   }, [userRole, selectedNgoUser]);
 
   useEffect(() => {
-    if (userRole === 'supplier' && activeDonationId) {
-      fetchBroadcastStatus();
-      const interval = setInterval(fetchBroadcastStatus, 2000);
+    if (userRole === 'supplier') {
+      fetchHistory();
+      if (activeDonationId) fetchBroadcastStatus();
+      const interval = setInterval(() => {
+        fetchHistory();
+        if (activeDonationId) fetchBroadcastStatus();
+      }, 2000);
       return () => clearInterval(interval);
     }
-  }, [userRole, activeDonationId]);
+  }, [userRole, selectedSupplierUser, activeDonationId]);
 
   const fetchNgoList = () => {
     fetch('/api/ngos')
@@ -1866,6 +1871,76 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* LIVE DECLINED REQUEST NOTIFICATION BANNER FOR RESTAURANT DASHBOARD */}
+                {(() => {
+                  const currentDeclined = (historyLogs || []).filter(
+                    (log) =>
+                      log.type === 'DECLINED' &&
+                      (log.supplier_id === selectedSupplierUser || log.supplier_name === supplierName) &&
+                      !dismissedDeclinedIds.includes(log.id)
+                  );
+                  if (currentDeclined.length === 0) return null;
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                      {currentDeclined.map((item) => (
+                        <div
+                          key={item.id}
+                          style={{
+                            background: 'linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%)',
+                            border: '1px solid #fecdd3',
+                            borderLeft: '5px solid #e11d48',
+                            borderRadius: 'var(--radius-md)',
+                            padding: '1rem 1.25rem',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            boxShadow: '0 4px 12px rgba(225, 29, 72, 0.08)'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#ffe4e6', color: '#e11d48', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                              <AlertTriangle style={{ width: '22px', height: '22px' }} />
+                            </div>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ fontSize: '0.725rem', fontWeight: '800', textTransform: 'uppercase', background: '#fecdd3', color: '#9f1239', padding: '0.15rem 0.5rem', borderRadius: '6px' }}>
+                                  Request Declined Notice
+                                </span>
+                                <span style={{ fontSize: '0.75rem', color: '#9f1239', fontWeight: '600' }}>
+                                  {item.timestamp ? formatDateTime(item.timestamp) : 'Just now'}
+                                </span>
+                              </div>
+                              <p style={{ fontWeight: '800', color: '#881337', fontSize: '0.95rem', marginTop: '0.25rem' }}>
+                                🏢 <strong>{item.ngo_name || 'NGO Shelter'}</strong> declined the request for <strong>{item.quantity} {item.food_name}</strong>.
+                              </p>
+                              <p style={{ fontSize: '0.8rem', color: '#9f1239', marginTop: '0.1rem' }}>
+                                You can create a new surplus donation or broadcast to other nearby verified shelters.
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setDismissedDeclinedIds((prev) => [...prev, item.id])}
+                            title="Dismiss notification"
+                            style={{
+                              background: 'transparent',
+                              border: 'none',
+                              color: '#9f1239',
+                              cursor: 'pointer',
+                              padding: '0.4rem',
+                              display: 'flex',
+                              alignItems: 'center',
+                              borderRadius: '6px'
+                            }}
+                          >
+                            <XCircle style={{ width: '20px', height: '20px' }} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })()}
+
                 {/* TWO-COLUMN LAYOUT: LEFT SIDEBAR NAVIGATION & MAIN CONTENT */}
                 <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '2rem', alignItems: 'start' }}>
                   {/* LEFT SIDEBAR NAVIGATION OPTIONS */}
@@ -2419,14 +2494,24 @@ export default function App() {
                               Sent request for <strong>{formData.quantity} {formData.food_name}</strong> to {selectedNgoIds.length} selected NGO shelters.
                             </p>
 
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-                              <button onClick={() => setUserRole('ngo')} className="btn-primary">
-                                Switch to NGO Dashboard <ChevronRight style={{ width: '16px', height: '16px' }} />
+                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+                              <button
+                                onClick={() => {
+                                  setSupplierSubTab('history');
+                                  setFlowStep('dashboard');
+                                }}
+                                className="btn-primary"
+                              >
+                                <Layers style={{ width: '16px', height: '16px' }} /> View Supplier Activity Stack
                               </button>
                               <button onClick={() => setFlowStep('dashboard')} className="btn-secondary">
-                                Return to Dashboard
+                                <PlusCircle style={{ width: '16px', height: '16px' }} /> Create Another Donation
                               </button>
                             </div>
+
+                            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem' }}>
+                              <Lock style={{ width: '12px', height: '12px', color: '#059669' }} /> To view shelter requests or access another portal, log in via the top-right Login menu.
+                            </p>
                           </div>
                         )}
                       </div>

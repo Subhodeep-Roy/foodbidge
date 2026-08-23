@@ -30,24 +30,30 @@ FoodBridge is an AI-driven surplus food rescue and distribution engine. It conne
                     ┌─────────────────────┐
                     │     Backend API     │
                     │  Node.js + Express  │
+                    │      :5000          │
                     └──────────┬──────────┘
                                │
               ┌────────────────┼────────────────┐
               │                │                │
               ▼                ▼                ▼
-       ┌────────────┐   ┌─────────────┐  ┌─────────────┐
-       │ PostgreSQL │   │ AI Services │  │ Maps / Geo  │
-       │ Database   │   │ Python API  │  │ API         │
-       └────────────┘   └──────┬──────┘  └─────────────┘
-                               │
-                               ▼
-                     ┌──────────────────┐
-                     │ Food Rescue Agent│
-                     └────────┬─────────┘
-                              │
-              ┌───────────────┼───────────────┐
-              ▼               ▼               ▼
-        Spoilage Skill   NGO Matching     Route Skill
+       ┌────────────┐  ┌──────────────────┐  ┌─────────────┐
+       │ JSON Store │  │  Python FastAPI   │  │ Haversine   │
+       │ (data/)    │  │  AI Engine :8000  │  │ Geo Calc    │
+       └────────────┘  └────────┬─────────┘  └─────────────┘
+                                │
+                       POST /match endpoint
+                                │
+                       ┌────────┴──────────┐
+                       │  NGO Scoring &    │
+                       │  Ranking Engine   │
+                       └────────┬──────────┘
+                                │
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                  ▼
+       Demand Score      Distance Score     Capacity Score
+         (40%)              (30%)              (20%)
+                                │
+                          Urgency (10%)
 ```
 
 ---
