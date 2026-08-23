@@ -1819,11 +1819,13 @@ export default function App() {
                           <Layers style={{ color: 'var(--primary)' }} /> Supplier Activity Stack (Persisted Stream)
                         </h3>
 
-                        {historyLogs.length === 0 ? (
+                        {historyLogs.filter((log) => log.type !== 'DECLINED').length === 0 ? (
                           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decision logs in stack. Click "Create Surplus Donation" in the menu to post your first offering!</p>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                             {historyLogs.map((log) => {
+                             {historyLogs
+                               .filter((log) => log.type !== 'DECLINED')
+                               .map((log) => {
                                 const estDeliveryIso = log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString();
                                 const isInTransit = log.type === 'ACCEPTED' && Date.now() < new Date(estDeliveryIso).getTime();
 
