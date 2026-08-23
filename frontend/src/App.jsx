@@ -690,8 +690,8 @@ export default function App() {
     setShowLoginMenu(false);
   };
 
-  const activeAcceptedLog = historyLogs.find((l) => l.type === 'ACCEPTED');
-  const activeNgoAcceptedLog = historyLogs.find((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED');
+  const activeAcceptedLogs = historyLogs.filter((l) => l.type === 'ACCEPTED');
+  const activeNgoAcceptedLogs = historyLogs.filter((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -1440,8 +1440,14 @@ export default function App() {
                               </button>
                             </div>
 
-                            {/* LIVE REAL-TIME LOGISTICS TRACKING CARD FOR ACCEPTED RESCUE ORDERS */}
-                            {activeAcceptedLog && <LiveLogisticsTracker log={activeAcceptedLog} />}
+                            {/* LIVE REAL-TIME LOGISTICS TRACKING CARD(S) FOR ACCEPTED RESCUE ORDERS */}
+                            {activeAcceptedLogs.length > 0 && (
+                              <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {activeAcceptedLogs.map((log) => (
+                                  <LiveLogisticsTracker key={log.id} log={log} />
+                                ))}
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -1806,55 +1812,62 @@ export default function App() {
                           <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decision logs in stack. Click "Create Surplus Donation" in the menu to post your first offering!</p>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                            {historyLogs.map((log) => (
-                              <div
-                                key={log.id}
-                                className="glass-card"
-                                style={{
-                                  padding: '1.25rem',
-                                  borderLeft:
-                                    log.type === 'ACCEPTED'
-                                      ? '4px solid #047857'
-                                      : log.type === 'DECLINED'
-                                      ? '4px solid #be123c'
-                                      : '4px solid #059669'
-                                }}
-                              >
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                  <div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                      <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
-                                        {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
-                                      </span>
-                                    </div>
+                             {historyLogs.map((log) => {
+                                const estDeliveryIso = log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString();
+                                const isInTransit = log.type === 'ACCEPTED' && Date.now() < new Date(estDeliveryIso).getTime();
 
-                                    <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
-                                      {log.quantity} {log.food_name}
-                                    </h4>
-                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                                      Target NGO: <strong>{log.ngo_name}</strong>
-                                    </p>
-
-                                    {log.type === 'ACCEPTED' && (
-                                      <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                                          <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
-                                          <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
+                                return (
+                                  <div
+                                    key={log.id}
+                                    className="glass-card"
+                                    style={{
+                                      padding: '1.25rem',
+                                      borderLeft:
+                                        log.type === 'ACCEPTED'
+                                          ? (isInTransit ? '4px solid #059669' : '4px solid #047857')
+                                          : log.type === 'DECLINED'
+                                          ? '4px solid #be123c'
+                                          : '4px solid #059669'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                      <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                          <span className={log.type === 'ACCEPTED' ? (isInTransit ? 'badge badge-medium' : 'badge badge-success') : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
+                                            {log.type === 'ACCEPTED' ? (isInTransit ? '🚚 IN TRANSIT & DISPATCHED' : '✅ DELIVERED & RECEIVED') : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
+                                          </span>
                                         </div>
 
-                                        <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                          <div style={{ color: '#047857', fontWeight: '700' }}>
-                                            🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
+                                        <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
+                                          {log.quantity} {log.food_name}
+                                        </h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                          Target NGO: <strong>{log.ngo_name}</strong>
+                                        </p>
+
+                                        {log.type === 'ACCEPTED' && (
+                                          <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                              <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
+                                              <span>
+                                                🏁 <strong>{isInTransit ? 'Est. Delivery Arrival:' : 'Delivered / Received:'}</strong> {formatDateTime(estDeliveryIso)}
+                                                {isInTransit && <strong style={{ color: '#059669', marginLeft: '0.35rem' }}>(In Transit)</strong>}
+                                              </span>
+                                            </div>
+
+                                            <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                              <div style={{ color: '#047857', fontWeight: '700' }}>
+                                                🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
+                                              </div>
+                                              <div style={{ color: '#059669', fontWeight: '700' }}>
+                                                🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
+                                              </div>
+                                              <div style={{ color: '#0d9488', fontWeight: '600' }}>
+                                                ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
+                                              </div>
+                                            </div>
                                           </div>
-                                          <div style={{ color: '#059669', fontWeight: '700' }}>
-                                            🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
-                                          </div>
-                                          <div style={{ color: '#0d9488', fontWeight: '600' }}>
-                                            ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
+                                        )}
 
                                     {log.type !== 'ACCEPTED' && (
                                       <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
@@ -1882,7 +1895,7 @@ export default function App() {
                                   </button>
                                 </div>
                               </div>
-                            ))}
+                            ); })}
                           </div>
                         )}
                       </div>
@@ -2127,11 +2140,12 @@ export default function App() {
                             </div>
                           )}
                         </div>
-
-                        {/* LIVE REAL-TIME LOGISTICS TRACKER FOR ACTIVE ACCEPTED RESCUE ORDER BELOW SUPPLIER REQUESTS */}
-                        {activeNgoAcceptedLog && (
-                          <div style={{ marginTop: '2rem' }}>
-                            <LiveLogisticsTracker log={activeNgoAcceptedLog} />
+                                          {/* LIVE REAL-TIME LOGISTICS TRACKING CARD(S) FOR ACTIVE ACCEPTED RESCUE ORDERS FOR THIS NGO */}
+                        {activeNgoAcceptedLogs.length > 0 && (
+                          <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            {activeNgoAcceptedLogs.map((log) => (
+                              <LiveLogisticsTracker key={log.id} log={log} />
+                            ))}
                           </div>
                         )}
                       </div>
@@ -2150,84 +2164,92 @@ export default function App() {
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                             {historyLogs
                               .filter((log) => log.ngo_id === selectedNgoUser)
-                              .map((log) => (
-                                <div
-                                  key={log.id}
-                                  className="glass-card"
-                                  style={{
-                                    padding: '1.25rem',
-                                    borderLeft:
-                                      log.type === 'ACCEPTED'
-                                        ? '4px solid #047857'
-                                        : log.type === 'DECLINED'
-                                        ? '4px solid #be123c'
-                                        : '4px solid #059669'
-                                  }}
-                                >
-                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                                    <div>
-                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                        <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
-                                          {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
-                                        </span>
+                              .map((log) => {
+                                const estDeliveryIso = log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString();
+                                const isInTransit = log.type === 'ACCEPTED' && Date.now() < new Date(estDeliveryIso).getTime();
+
+                                return (
+                                  <div
+                                    key={log.id}
+                                    className="glass-card"
+                                    style={{
+                                      padding: '1.25rem',
+                                      borderLeft:
+                                        log.type === 'ACCEPTED'
+                                          ? (isInTransit ? '4px solid #059669' : '4px solid #047857')
+                                          : log.type === 'DECLINED'
+                                          ? '4px solid #be123c'
+                                          : '4px solid #059669'
+                                    }}
+                                  >
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                      <div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                          <span className={log.type === 'ACCEPTED' ? (isInTransit ? 'badge badge-medium' : 'badge badge-success') : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
+                                            {log.type === 'ACCEPTED' ? (isInTransit ? '🚚 IN TRANSIT & DISPATCHED' : '✅ DELIVERED & RECEIVED') : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
+                                          </span>
+                                        </div>
+
+                                        <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
+                                          {log.quantity} {log.food_name}
+                                        </h4>
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                          Supplier: <strong>{log.supplier_name}</strong>
+                                        </p>
+
+                                        {log.type === 'ACCEPTED' && (
+                                          <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                              <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
+                                              <span>
+                                                🏁 <strong>{isInTransit ? 'Est. Delivery Arrival:' : 'Delivered / Received:'}</strong> {formatDateTime(estDeliveryIso)}
+                                                {isInTransit && <strong style={{ color: '#059669', marginLeft: '0.35rem' }}>(In Transit)</strong>}
+                                              </span>
+                                            </div>
+
+                                            <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                              <div style={{ color: '#047857', fontWeight: '700' }}>
+                                                🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
+                                              </div>
+                                              <div style={{ color: '#059669', fontWeight: '700' }}>
+                                                🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
+                                              </div>
+                                              <div style={{ color: '#0d9488', fontWeight: '600' }}>
+                                                ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
+                                              </div>
+                                            </div>
+                                          </div>
+                                        )}
+
+                                        {log.type !== 'ACCEPTED' && (
+                                          <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
+                                            {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                          </p>
+                                        )}
                                       </div>
 
-                                      <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
-                                        {log.quantity} {log.food_name}
-                                      </h4>
-                                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                                        Supplier: <strong>{log.supplier_name}</strong>
-                                      </p>
-
-                                      {log.type === 'ACCEPTED' && (
-                                        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                                            <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
-                                            <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
-                                          </div>
-
-                                          <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                            <div style={{ color: '#047857', fontWeight: '700' }}>
-                                              🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
-                                            </div>
-                                            <div style={{ color: '#059669', fontWeight: '700' }}>
-                                              🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
-                                            </div>
-                                            <div style={{ color: '#0d9488', fontWeight: '600' }}>
-                                              ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
-                                            </div>
-                                          </div>
-                                        </div>
-                                      )}
-
-                                      {log.type !== 'ACCEPTED' && (
-                                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
-                                          {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </p>
-                                      )}
+                                      <button
+                                        onClick={(e) => handleDeleteHistoryLog(log.id, e)}
+                                        title="Delete history entry"
+                                        style={{
+                                          background: '#ffe4e6',
+                                          color: '#be123c',
+                                          border: '1px solid #fecdd3',
+                                          borderRadius: '8px',
+                                          padding: '0.4rem 0.6rem',
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          justifyContent: 'center',
+                                          cursor: 'pointer'
+                                        }}
+                                      >
+                                        <Trash2 style={{ width: '15px', height: '15px' }} />
+                                      </button>
                                     </div>
-
-                                    <button
-                                      onClick={(e) => handleDeleteHistoryLog(log.id, e)}
-                                      title="Delete history entry"
-                                      style={{
-                                        background: '#ffe4e6',
-                                        color: '#be123c',
-                                        border: '1px solid #fecdd3',
-                                        borderRadius: '8px',
-                                        padding: '0.4rem 0.6rem',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        cursor: 'pointer'
-                                      }}
-                                    >
-                                      <Trash2 style={{ width: '15px', height: '15px' }} />
-                                    </button>
                                   </div>
-                                </div>
-                              ))}
-                          </div>
+                                );
+                              })}
+                            </div>
                         )}
                       </div>
                     )}
