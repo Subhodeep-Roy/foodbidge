@@ -263,6 +263,12 @@ export default function App() {
   const [passwordError, setPasswordError] = useState(null);
   const [showPasswordText, setShowPasswordText] = useState(false);
 
+  // Navigation Tab & Flow State
+  const [activeTab, setActiveTab] = useState('main'); // 'main', 'ngos'
+  const [flowStep, setFlowStep] = useState('dashboard'); // 'dashboard', 'create', 'analyzing', 'recommended', 'broadcast_sent'
+  const [supplierSubTab, setSupplierSubTab] = useState('create'); // 'create', 'history'
+  const [ngoSubTab, setNgoSubTab] = useState('requests'); // 'requests', 'history'
+
   // Header Single Login Dropdown State & Click-Outside Ref
   const [showLoginMenu, setShowLoginMenu] = useState(false);
   const loginMenuRef = useRef(null);
