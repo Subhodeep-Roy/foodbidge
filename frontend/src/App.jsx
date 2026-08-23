@@ -1710,11 +1710,11 @@ export default function App() {
 
                             {/* OTHER NGO CANDIDATES */}
                             <h4 style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '1rem', color: '#042f1a' }}>
-                              Other Verified Shelter Candidates ({analysisResult.ngos.length})
+                              Other Verified Shelter Candidates ({(analysisResult.alternativeNgos || analysisResult.ngos || []).length})
                             </h4>
 
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                              {analysisResult.ngos.map((ngo) => {
+                              {(analysisResult.alternativeNgos || analysisResult.ngos || []).map((ngo) => {
                                 const isSelected = selectedNgoIds.includes(ngo.id);
                                 return (
                                   <div
