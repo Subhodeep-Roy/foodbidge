@@ -233,6 +233,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('main'); // 'main', 'ngos', 'governance'
   const [flowStep, setFlowStep] = useState('dashboard'); // 'dashboard', 'create', 'analyzing', 'recommended', 'broadcast_sent'
   const [supplierSubTab, setSupplierSubTab] = useState('create'); // 'create', 'history'
+  const [ngoSubTab, setNgoSubTab] = useState('requests'); // 'requests', 'history'
 
   // Header Single Login Dropdown State & Click-Outside Ref
   const [showLoginMenu, setShowLoginMenu] = useState(false);
@@ -1890,18 +1891,17 @@ export default function App() {
                 </div>
               </div>
             )}
-            {/* NGO SHELTER DASHBOARD */}
+            {/* NGO SHELTER DASHBOARD WITH LEFT SIDEBAR NAVIGATION */}
             {userRole === 'ngo' && (
               <div>
-                {/* LIVE LOGISTICS TRACKER FOR ACTIVE ACCEPTED RESCUE ORDER FOR THIS NGO */}
-                {activeNgoAcceptedLog && <LiveLogisticsTracker log={activeNgoAcceptedLog} />}
+                {/* NGO HEADER BAR WITH ACTIVE SHELTER SELECTOR */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                   <div>
                     <h2 style={{ fontSize: '1.6rem', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
                       <LayoutDashboard style={{ color: '#0d9488' }} /> NGO Shelter Dashboard — <span className="gradient-text">{currentNgoName}</span>
                     </h2>
                     <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                      Operational View: Incoming Rescue Requests, Decision Controls, and Chronological Activity Stack.
+                      Operational View: Incoming Rescue Requests, Decision Controls, and Real-Time Spoilage Tracking.
                     </p>
                   </div>
 
@@ -1970,195 +1970,268 @@ export default function App() {
                   </div>
                 )}
 
-                {/* INCOMING DONATION REQUEST STACK */}
-                <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', background: '#ffffff' }}>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
-                    <Bell style={{ color: 'var(--accent-amber)', width: '20px', height: '20px' }} /> Incoming Food Rescue Request Stack
-                  </h3>
+                {/* TWO-COLUMN GRID LAYOUT WITH LEFT SIDEBAR NAVIGATION */}
+                <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '1.5rem', alignItems: 'start' }}>
+                  {/* LEFT SIDEBAR NAVIGATION */}
+                  <div className="glass-panel" style={{ padding: '1.25rem', background: '#ffffff', position: 'sticky', top: '2rem' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '1rem' }}>
+                      NGO Navigation Menu
+                    </p>
 
-                  {ngoRequests.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
-                      <CheckCircle2 style={{ width: '40px', height: '40px', margin: '0 auto 1rem', opacity: 0.5 }} />
-                      <p style={{ fontSize: '1rem', fontWeight: '600' }}>No pending requests for {currentNgoName}</p>
-                      <p style={{ fontSize: '0.85rem', marginTop: '0.3rem' }}>
-                        Switch to Supplier persona to post surplus and broadcast a request!
-                      </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <button
+                        onClick={() => setNgoSubTab('requests')}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.85rem 1rem',
+                          borderRadius: 'var(--radius-md)',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          background: ngoSubTab === 'requests' ? 'var(--primary)' : 'transparent',
+                          color: ngoSubTab === 'requests' ? '#ffffff' : '#042f1a',
+                          fontSize: '0.925rem',
+                          fontWeight: '700',
+                          border: ngoSubTab === 'requests' ? '1px solid var(--primary)' : '1px solid rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        <Bell style={{ width: '18px', height: '18px' }} /> Supplier Request
+                      </button>
+
+                      <button
+                        onClick={() => setNgoSubTab('history')}
+                        style={{
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.75rem',
+                          padding: '0.85rem 1rem',
+                          borderRadius: 'var(--radius-md)',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s ease',
+                          background: ngoSubTab === 'history' ? '#047857' : 'transparent',
+                          color: ngoSubTab === 'history' ? '#ffffff' : '#042f1a',
+                          fontSize: '0.925rem',
+                          fontWeight: '700',
+                          border: ngoSubTab === 'history' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        <Layers style={{ width: '18px', height: '18px' }} /> History - NGO Activity Stack
+                      </button>
                     </div>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                      {ngoRequests.map((req) => (
-                        <div
-                          key={req.id}
-                          className="glass-card"
-                          style={{
-                            padding: '1.5rem',
-                            border: req.status === 'PENDING' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
-                          }}
-                        >
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-                            <div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
-                                <span className="badge badge-medium">Incoming Donation Offer</span>
-                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                                  Received {new Date(req.requested_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(req.requested_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                              </div>
+                  </div>
 
-                              <h4 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#042f1a' }}>
-                                {req.quantity} {req.food_name}
-                              </h4>
-                              <p style={{ fontSize: '0.9rem', color: '#059669', fontWeight: '700', marginTop: '0.2rem' }}>
-                                From Supplier: 🍽️ {req.supplier_name}
+                  {/* RIGHT MAIN CONTENT AREA */}
+                  <div>
+                    {/* VIEW 1: SUPPLIER REQUEST SUBTAB */}
+                    {ngoSubTab === 'requests' && (
+                      <div>
+                        {/* INCOMING DONATION REQUEST STACK */}
+                        <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
+                          <h3 style={{ fontSize: '1.2rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
+                            <Bell style={{ color: 'var(--accent-amber)', width: '20px', height: '20px' }} /> Incoming Food Rescue Request Stack
+                          </h3>
+
+                          {ngoRequests.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)' }}>
+                              <CheckCircle2 style={{ width: '40px', height: '40px', margin: '0 auto 1rem', opacity: 0.5 }} />
+                              <p style={{ fontSize: '1rem', fontWeight: '600' }}>No pending requests for {currentNgoName}</p>
+                              <p style={{ fontSize: '0.85rem', marginTop: '0.3rem' }}>
+                                Switch to Supplier persona to post surplus and broadcast a request!
                               </p>
-
-                              <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                  <Clock style={{ width: '14px', height: '14px', color: 'var(--accent-amber)' }} /> Safe Window: {req.usable_hours}h
-                                </span>
-                                <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-                                  <Utensils style={{ width: '14px', height: '14px', color: '#059669' }} /> Type: {req.food_type}
-                                </span>
-                              </div>
                             </div>
+                          ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                              {ngoRequests.map((req) => (
+                                <div
+                                  key={req.id}
+                                  className="glass-card"
+                                  style={{
+                                    padding: '1.5rem',
+                                    border: req.status === 'PENDING' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                    <div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.4rem' }}>
+                                        <span className="badge badge-medium">Incoming Donation Offer</span>
+                                        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                                          Received {new Date(req.requested_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(req.requested_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </span>
+                                      </div>
 
-                            {/* ACTION BUTTONS */}
-                            <div>
-                              {req.status === 'PENDING' && (
-                                <div style={{ display: 'flex', gap: '0.75rem' }}>
-                                  <button
-                                    onClick={() => handleNgoResponse(req.id, 'DECLINE')}
-                                    disabled={isSubmitting}
-                                    className="btn-secondary"
-                                    style={{ border: '1px solid #fecdd3', color: '#be123c', background: '#fff1f2' }}
-                                  >
-                                    <XCircle style={{ width: '16px', height: '16px' }} /> Decline
-                                  </button>
-                                  <button
-                                    onClick={() => handleNgoResponse(req.id, 'ACCEPT')}
-                                    disabled={isSubmitting}
-                                    className="btn-primary"
-                                  >
-                                    <CheckCircle2 style={{ width: '16px', height: '16px' }} /> Accept & Dispatch Pickup
-                                  </button>
-                                </div>
-                              )}
+                                      <h4 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#042f1a' }}>
+                                        {req.quantity} {req.food_name}
+                                      </h4>
+                                      <p style={{ fontSize: '0.9rem', color: '#059669', fontWeight: '700', marginTop: '0.2rem' }}>
+                                        From Supplier: 🍽️ {req.supplier_name}
+                                      </p>
 
-                              {req.status === 'ACCEPTED' && (
-                                <span className="badge badge-success" style={{ padding: '0.5rem 1rem' }}>
-                                  ✅ Request Accepted by You
-                                </span>
-                              )}
-
-                              {req.status === 'DECLINED' && (
-                                <span className="badge badge-high" style={{ padding: '0.5rem 1rem' }}>
-                                  ❌ Request Declined
-                                </span>
-                              )}
-
-                              {req.status === 'EXPIRED_ACCEPTED_BY_OTHER' && (
-                                <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                  ⚪ Already accepted by another shelter
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* NGO CHRONOLOGICAL ACTIVITY STACK WITH DELETE BUTTON */}
-                <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
-                    <Layers style={{ color: 'var(--primary)' }} /> NGO Activity Stack ({currentNgoName})
-                  </h3>
-
-                  {historyLogs.filter((log) => log.ngo_id === selectedNgoUser).length === 0 ? (
-                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decisions in stack for this shelter.</p>
-                  ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-                      {historyLogs
-                        .filter((log) => log.ngo_id === selectedNgoUser)
-                        .map((log) => (
-                          <div
-                            key={log.id}
-                            className="glass-card"
-                            style={{
-                              padding: '1.25rem',
-                              borderLeft:
-                                log.type === 'ACCEPTED'
-                                  ? '4px solid #047857'
-                                  : log.type === 'DECLINED'
-                                  ? '4px solid #be123c'
-                                  : '4px solid #059669'
-                            }}
-                          >
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
-                              <div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
-                                  <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
-                                    {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
-                                  </span>
-                                </div>
-
-                                <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
-                                  {log.quantity} {log.food_name}
-                                </h4>
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
-                                  Supplier: <strong>{log.supplier_name}</strong>
-                                </p>
-
-                                {log.type === 'ACCEPTED' && (
-                                  <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                                      <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
-                                      <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
+                                      <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                          <Clock style={{ width: '14px', height: '14px', color: 'var(--accent-amber)' }} /> Safe Window: {req.usable_hours}h
+                                        </span>
+                                        <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                          <Utensils style={{ width: '14px', height: '14px', color: '#059669' }} /> Type: {req.food_type}
+                                        </span>
+                                      </div>
                                     </div>
 
-                                    <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                                      <div style={{ color: '#047857', fontWeight: '700' }}>
-                                        🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
-                                      </div>
-                                      <div style={{ color: '#059669', fontWeight: '700' }}>
-                                        🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
-                                      </div>
-                                      <div style={{ color: '#0d9488', fontWeight: '600' }}>
-                                        ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
-                                      </div>
+                                    {/* ACTION BUTTONS */}
+                                    <div>
+                                      {req.status === 'PENDING' && (
+                                        <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                          <button
+                                            onClick={() => handleNgoResponse(req.id, 'DECLINE')}
+                                            disabled={isSubmitting}
+                                            className="btn-secondary"
+                                            style={{ border: '1px solid #fecdd3', color: '#be123c', background: '#fff1f2' }}
+                                          >
+                                            <XCircle style={{ width: '16px', height: '16px' }} /> Decline
+                                          </button>
+                                          <button
+                                            onClick={() => handleNgoResponse(req.id, 'ACCEPT')}
+                                            disabled={isSubmitting}
+                                            className="btn-primary"
+                                          >
+                                            <CheckCircle2 style={{ width: '16px', height: '16px' }} /> Accept & Dispatch Pickup
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {req.status === 'ACCEPTED' && (
+                                        <span className="badge badge-success" style={{ padding: '0.5rem 1rem' }}>
+                                          ✅ Request Accepted by You
+                                        </span>
+                                      )}
+
+                                      {req.status === 'DECLINED' && (
+                                        <span className="badge badge-high" style={{ padding: '0.5rem 1rem' }}>
+                                          ❌ Request Declined
+                                        </span>
+                                      )}
+
+                                      {req.status === 'EXPIRED_ACCEPTED_BY_OTHER' && (
+                                        <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                                          ⚪ Already accepted by another shelter
+                                        </span>
+                                      )}
                                     </div>
                                   </div>
-                                )}
-
-                                {log.type !== 'ACCEPTED' && (
-                                  <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
-                                    {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </p>
-                                )}
-                              </div>
-
-                              <button
-                                onClick={(e) => handleDeleteHistoryLog(log.id, e)}
-                                title="Delete history entry"
-                                style={{
-                                  background: '#ffe4e6',
-                                  color: '#be123c',
-                                  border: '1px solid #fecdd3',
-                                  borderRadius: '8px',
-                                  padding: '0.4rem 0.6rem',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  cursor: 'pointer'
-                                }}
-                              >
-                                <Trash2 style={{ width: '15px', height: '15px' }} />
-                              </button>
+                                </div>
+                              ))}
                             </div>
+                          )}
+                        </div>
+
+                        {/* LIVE REAL-TIME LOGISTICS TRACKER FOR ACTIVE ACCEPTED RESCUE ORDER BELOW SUPPLIER REQUESTS */}
+                        {activeNgoAcceptedLog && (
+                          <div style={{ marginTop: '2rem' }}>
+                            <LiveLogisticsTracker log={activeNgoAcceptedLog} />
                           </div>
-                        ))}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
+
+                    {/* VIEW 2: HISTORY - NGO ACTIVITY STACK SUBTAB */}
+                    {ngoSubTab === 'history' && (
+                      <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
+                          <Layers style={{ color: 'var(--primary)' }} /> NGO Activity Stack ({currentNgoName})
+                        </h3>
+
+                        {historyLogs.filter((log) => log.ngo_id === selectedNgoUser).length === 0 ? (
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decisions in stack for this shelter.</p>
+                        ) : (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                            {historyLogs
+                              .filter((log) => log.ngo_id === selectedNgoUser)
+                              .map((log) => (
+                                <div
+                                  key={log.id}
+                                  className="glass-card"
+                                  style={{
+                                    padding: '1.25rem',
+                                    borderLeft:
+                                      log.type === 'ACCEPTED'
+                                        ? '4px solid #047857'
+                                        : log.type === 'DECLINED'
+                                        ? '4px solid #be123c'
+                                        : '4px solid #059669'
+                                  }}
+                                >
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem' }}>
+                                    <div>
+                                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.2rem' }}>
+                                        <span className={log.type === 'ACCEPTED' ? 'badge badge-success' : log.type === 'DECLINED' ? 'badge badge-high' : 'badge badge-medium'}>
+                                          {log.type === 'ACCEPTED' ? '✅ ACCEPTED & DISPATCHED' : log.type === 'DECLINED' ? '❌ DECLINED' : '⏳ PENDING'}
+                                        </span>
+                                      </div>
+
+                                      <h4 style={{ fontWeight: '800', fontSize: '1.1rem', color: '#042f1a', marginTop: '0.2rem' }}>
+                                        {log.quantity} {log.food_name}
+                                      </h4>
+                                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                                        Supplier: <strong>{log.supplier_name}</strong>
+                                      </p>
+
+                                      {log.type === 'ACCEPTED' && (
+                                        <div style={{ marginTop: '0.75rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.25rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                                            <span>🚀 <strong>Dispatched:</strong> {formatDateTime(log.dispatched_at || log.timestamp || log.requested_at)}</span>
+                                            <span>🏁 <strong>Est. Received:</strong> {formatDateTime(log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString())}</span>
+                                          </div>
+
+                                          <div style={{ background: '#f4fbf7', padding: '0.6rem 0.85rem', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(16, 185, 129, 0.2)', fontSize: '0.78rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                            <div style={{ color: '#047857', fontWeight: '700' }}>
+                                              🛵 <strong>Delivery Partner:</strong> {log.delivery_partner || log.delivery_partner_name || 'Vikram Singh (Rider #FB-104 - EV Cargo Bike)'}
+                                            </div>
+                                            <div style={{ color: '#059669', fontWeight: '700' }}>
+                                              🛡️ <strong>FoodBridge Assistant:</strong> {log.foodbridge_assistant || 'Priya Sharma (Food Safety Inspector #FBA-12)'}
+                                            </div>
+                                            <div style={{ color: '#0d9488', fontWeight: '600' }}>
+                                              ⏱️ <strong>Transit Time:</strong> {log.supplier_eta_mins || 8} mins to Supplier ➔ {log.ngo_eta_mins || 14} mins to NGO Shelter ({log.total_eta_mins || 22} mins total)
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )}
+
+                                      {log.type !== 'ACCEPTED' && (
+                                        <p style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '0.3rem', fontWeight: '500' }}>
+                                          {new Date(log.timestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} • {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                      )}
+                                    </div>
+
+                                    <button
+                                      onClick={(e) => handleDeleteHistoryLog(log.id, e)}
+                                      title="Delete history entry"
+                                      style={{
+                                        background: '#ffe4e6',
+                                        color: '#be123c',
+                                        border: '1px solid #fecdd3',
+                                        borderRadius: '8px',
+                                        padding: '0.4rem 0.6rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      <Trash2 style={{ width: '15px', height: '15px' }} />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
