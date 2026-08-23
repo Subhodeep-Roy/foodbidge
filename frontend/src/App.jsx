@@ -690,8 +690,19 @@ export default function App() {
     setShowLoginMenu(false);
   };
 
-  const activeAcceptedLogs = historyLogs.filter((l) => l.type === 'ACCEPTED');
-  const activeNgoAcceptedLogs = historyLogs.filter((l) => l.ngo_id === selectedNgoUser && l.type === 'ACCEPTED');
+  const isLogActiveInTransit = (l) => {
+    if (!l || l.type !== 'ACCEPTED') return false;
+    if (l.status === 'DELIVERED' || l.delivered === true) return false;
+    const dispatchedTime = new Date(l.dispatched_at || l.timestamp || l.requested_at).getTime();
+    const totalEtaMins = l.total_eta_mins || 22;
+    const ngoDeliveryMs = l.estimated_delivery_at
+      ? new Date(l.estimated_delivery_at).getTime()
+      : dispatchedTime + totalEtaMins * 60 * 1000;
+    return Date.now() < ngoDeliveryMs;
+  };
+
+  const activeAcceptedLogs = historyLogs.filter((l) => isLogActiveInTransit(l));
+  const activeNgoAcceptedLogs = historyLogs.filter((l) => l.ngo_id === selectedNgoUser && isLogActiveInTransit(l));
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
