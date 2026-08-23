@@ -228,7 +228,30 @@ export default function App() {
   // Navigation & Role State
   const [userRole, setUserRole] = useState(null); // null (Home), 'supplier', 'ngo'
   const [selectedNgoUser, setSelectedNgoUser] = useState('ngo_101');
-  const [supplierName, setSupplierName] = useState('Grand Horizon Restaurant');
+  const [selectedSupplierUser, setSelectedSupplierUser] = useState('sup_1');
+
+  // Live Registered Restaurants / Food Suppliers List
+  const [suppliersList, setSuppliersList] = useState([
+    { id: 'sup_1', name: 'Grand Horizon Restaurant', address: '12 MG Road, Indiranagar, Bengaluru', food_type_specialty: 'Multicuisine & Buffet', contact_phone: '+91 98765 43210', verified: true },
+    { id: 'sup_2', name: 'Royal Feast Catering Services', address: '45 Koramangala 5th Block, Bengaluru', food_type_specialty: 'Banquet & Event Meals', contact_phone: '+91 98123 45678', verified: true },
+    { id: 'sup_3', name: 'Green Leaf Bakery & Bistro', address: '88 Jayanagar 4th Block, Bengaluru', food_type_specialty: 'Baked Goods & Fresh Produce', contact_phone: '+91 97654 32109', verified: true },
+    { id: 'sup_4', name: 'Spice Garden Commercial Kitchen', address: '15 Whitefield Main Rd, Bengaluru', food_type_specialty: 'South Indian & Vegetarian Meals', contact_phone: '+91 96543 21098', verified: true }
+  ]);
+
+  const [showAddSupplierForm, setShowAddSupplierForm] = useState(false);
+  const [newSupplierData, setNewSupplierData] = useState({
+    name: '',
+    address: '',
+    food_type_specialty: 'Multicuisine & Buffet',
+    contact_phone: ''
+  });
+
+  const currentSupplier = suppliersList.find((s) => s.id === selectedSupplierUser) || suppliersList[0] || {
+    id: 'sup_1',
+    name: 'Grand Horizon Restaurant',
+    address: '12 MG Road, Indiranagar, Bengaluru'
+  };
+  const supplierName = currentSupplier.name;
 
   const [activeTab, setActiveTab] = useState('main'); // 'main', 'ngos', 'governance'
   const [flowStep, setFlowStep] = useState('dashboard'); // 'dashboard', 'create', 'analyzing', 'recommended', 'broadcast_sent'
@@ -312,14 +335,16 @@ export default function App() {
     };
   }, []);
 
-  // Fetch initial impact stats, history & live NGOs list on mount
+  // Fetch initial impact stats, history, live NGOs & suppliers list on mount
   useEffect(() => {
     fetchImpact();
     fetchHistory();
     fetchNgoList();
+    fetchSupplierList();
     const interval = setInterval(() => {
       fetchHistory();
       fetchNgoList();
+      fetchSupplierList();
     }, 4000);
     return () => clearInterval(interval);
   }, []);
@@ -348,6 +373,20 @@ export default function App() {
           setNgoList(data.ngos);
           if (!data.ngos.some((n) => n.id === selectedNgoUser)) {
             setSelectedNgoUser(data.ngos[0].id);
+          }
+        }
+      })
+      .catch(() => {});
+  };
+
+  const fetchSupplierList = () => {
+    fetch('/api/suppliers')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.suppliers && data.suppliers.length > 0) {
+          setSuppliersList(data.suppliers);
+          if (!data.suppliers.some((s) => s.id === selectedSupplierUser)) {
+            setSelectedSupplierUser(data.suppliers[0].id);
           }
         }
       })
@@ -383,6 +422,49 @@ export default function App() {
         }
       })
       .catch(() => {});
+  };
+
+  // Register New Restaurant / Food Supplier
+  const handleRegisterSupplierSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (!newSupplierData.name || !newSupplierData.address) {
+      alert('Please fill in Restaurant/Supplier Name and Address.');
+      return;
+    }
+    setIsSubmitting(true);
+    fetch('/api/suppliers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newSupplierData)
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setIsSubmitting(false);
+        if (data.success && data.supplier) {
+          setSuppliersList((prev) => [data.supplier, ...prev]);
+          setSelectedSupplierUser(data.supplier.id);
+          setNewSupplierData({
+            name: '',
+            address: '',
+            food_type_specialty: 'Multicuisine & Buffet',
+            contact_phone: ''
+          });
+          setShowAddSupplierForm(false);
+          alert(`✅ Restaurant "${data.supplier.name}" registered successfully!`);
+        }
+      })
+      .catch(() => {
+        setIsSubmitting(false);
+        const newSup = {
+          id: `sup_${Date.now()}`,
+          ...newSupplierData,
+          verified: true
+        };
+        setSuppliersList((prev) => [newSup, ...prev]);
+        setSelectedSupplierUser(newSup.id);
+        setShowAddSupplierForm(false);
+        alert(`✅ Restaurant "${newSup.name}" registered successfully!`);
+      });
   };
 
   // Register New NGO Shelter with Verified Required Documents
@@ -495,7 +577,8 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          supplier_name: supplierName
+          supplier_name: supplierName,
+          supplier_id: currentSupplier.id
         })
       })
         .then((res) => res.json())
@@ -701,7 +784,9 @@ export default function App() {
     return Date.now() < ngoDeliveryMs;
   };
 
-  const activeAcceptedLogs = historyLogs.filter((l) => isLogActiveInTransit(l));
+  const activeAcceptedLogs = historyLogs.filter(
+    (l) => isLogActiveInTransit(l) && (l.supplier_id === selectedSupplierUser || l.supplier_name === supplierName)
+  );
   const activeNgoAcceptedLogs = historyLogs.filter((l) => l.ngo_id === selectedNgoUser && isLogActiveInTransit(l));
 
   return (
@@ -1358,6 +1443,61 @@ export default function App() {
                       top: '90px'
                     }}
                   >
+                    <div style={{ background: '#f4fbf7', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.3)', marginBottom: '0.5rem' }}>
+                      <label style={{ fontSize: '0.725rem', fontWeight: '800', color: '#047857', textTransform: 'uppercase', display: 'block', marginBottom: '0.35rem' }}>
+                        Active Restaurant Persona
+                      </label>
+                      <select
+                        value={selectedSupplierUser}
+                        onChange={(e) => setSelectedSupplierUser(e.target.value)}
+                        style={{
+                          width: '100%',
+                          padding: '0.5rem 0.6rem',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--primary)',
+                          fontWeight: '700',
+                          color: '#042f1a',
+                          fontSize: '0.85rem',
+                          background: '#ffffff',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {suppliersList.map((sup) => (
+                          <option key={sup.id} value={sup.id}>
+                            🍽️ {sup.name}
+                          </option>
+                        ))}
+                      </select>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.35rem', lineHeight: '1.2' }}>
+                        📍 {currentSupplier.address}
+                      </p>
+
+                      <button
+                        onClick={() => {
+                          setShowAddSupplierForm(!showAddSupplierForm);
+                          setSupplierSubTab('create');
+                        }}
+                        style={{
+                          width: '100%',
+                          marginTop: '0.6rem',
+                          padding: '0.45rem 0.6rem',
+                          fontSize: '0.75rem',
+                          fontWeight: '700',
+                          color: '#047857',
+                          background: '#d1fae5',
+                          border: '1px solid #a7f3d0',
+                          borderRadius: '6px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.3rem'
+                        }}
+                      >
+                        <PlusCircle style={{ width: '13px', height: '13px' }} /> {showAddSupplierForm ? 'Close Registration' : '+ Add Restaurant'}
+                      </button>
+                    </div>
+
                     <p style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>
                       Supplier Navigation
                     </p>
@@ -1404,6 +1544,85 @@ export default function App() {
                     {/* VIEW 1: CREATE SURPLUS DONATION SUBTAB */}
                     {supplierSubTab === 'create' && (
                       <div>
+                        {/* REGISTER NEW RESTAURANT / SUPPLIER FORM CARD */}
+                        {showAddSupplierForm && (
+                          <div className="glass-panel" style={{ padding: '2rem', marginBottom: '1.5rem', background: '#ffffff', border: '2px solid var(--primary)' }}>
+                            <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <Utensils style={{ color: '#059669' }} /> Register New Restaurant / Food Supplier
+                            </h3>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+                              Add a new food business establishment to broadcast surplus offerings to nearby verified shelters.
+                            </p>
+
+                            <form onSubmit={handleRegisterSupplierSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                              <div>
+                                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#042f1a', display: 'block', marginBottom: '0.3rem' }}>
+                                  Restaurant / Business Name *
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. Olive Garden Bistro & Bakery"
+                                  value={newSupplierData.name}
+                                  onChange={(e) => setNewSupplierData({ ...newSupplierData, name: e.target.value })}
+                                  required
+                                  style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #d1d5db', fontSize: '0.9rem' }}
+                                />
+                              </div>
+
+                              <div>
+                                <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#042f1a', display: 'block', marginBottom: '0.3rem' }}>
+                                  Full Street Address & Area *
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="e.g. 104 Indiranagar 100ft Road, Bengaluru"
+                                  value={newSupplierData.address}
+                                  onChange={(e) => setNewSupplierData({ ...newSupplierData, address: e.target.value })}
+                                  required
+                                  style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #d1d5db', fontSize: '0.9rem' }}
+                                />
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                <div>
+                                  <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#042f1a', display: 'block', marginBottom: '0.3rem' }}>
+                                    Food Type Specialty
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. Multicuisine & Bakery"
+                                    value={newSupplierData.food_type_specialty}
+                                    onChange={(e) => setNewSupplierData({ ...newSupplierData, food_type_specialty: e.target.value })}
+                                    style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #d1d5db', fontSize: '0.9rem' }}
+                                  />
+                                </div>
+
+                                <div>
+                                  <label style={{ fontSize: '0.8rem', fontWeight: '700', color: '#042f1a', display: 'block', marginBottom: '0.3rem' }}>
+                                    Contact Phone Number
+                                  </label>
+                                  <input
+                                    type="text"
+                                    placeholder="e.g. +91 98765 43210"
+                                    value={newSupplierData.contact_phone}
+                                    onChange={(e) => setNewSupplierData({ ...newSupplierData, contact_phone: e.target.value })}
+                                    style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: 'var(--radius-sm)', border: '1px solid #d1d5db', fontSize: '0.9rem' }}
+                                  />
+                                </div>
+                              </div>
+
+                              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                                <button type="button" onClick={() => setShowAddSupplierForm(false)} className="btn-secondary">
+                                  Cancel
+                                </button>
+                                <button type="submit" disabled={isSubmitting} className="btn-primary">
+                                  <PlusCircle style={{ width: '16px', height: '16px' }} /> Register Restaurant
+                                </button>
+                              </div>
+                            </form>
+                          </div>
+                        )}
+
                         {/* DEFAULT STEP: SHOW CREATE SURPLUS FOOD DONATION CARD + REAL-TIME LOGISTICS TRACKING */}
                         {flowStep === 'dashboard' && (
                           <div>
@@ -1816,15 +2035,15 @@ export default function App() {
                     {supplierSubTab === 'history' && (
                       <div className="glass-panel" style={{ padding: '2rem', background: '#ffffff' }}>
                         <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#042f1a' }}>
-                          <Layers style={{ color: 'var(--primary)' }} /> Supplier Activity Stack (Persisted Stream)
+                          <Layers style={{ color: 'var(--primary)' }} /> Supplier Activity Stack ({supplierName})
                         </h3>
 
-                        {historyLogs.filter((log) => log.type !== 'DECLINED').length === 0 ? (
-                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decision logs in stack. Click "Create Surplus Donation" in the menu to post your first offering!</p>
+                        {historyLogs.filter((log) => log.type !== 'DECLINED' && (log.supplier_id === selectedSupplierUser || log.supplier_name === supplierName)).length === 0 ? (
+                          <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>No historical decision logs in stack for {supplierName}. Click "Create Surplus Donation" in the menu to post your first offering!</p>
                         ) : (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                              {historyLogs
-                               .filter((log) => log.type !== 'DECLINED')
+                               .filter((log) => log.type !== 'DECLINED' && (log.supplier_id === selectedSupplierUser || log.supplier_name === supplierName))
                                .map((log) => {
                                 const estDeliveryIso = log.estimated_delivery_at || new Date(new Date(log.dispatched_at || log.timestamp || log.requested_at).getTime() + (log.total_eta_mins || 22) * 60 * 1000).toISOString();
                                 const isInTransit = log.type === 'ACCEPTED' && Date.now() < new Date(estDeliveryIso).getTime();

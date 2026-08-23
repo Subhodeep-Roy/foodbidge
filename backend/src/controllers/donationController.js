@@ -96,7 +96,43 @@ let defaultImpact = {
   pickups_completed: 12
 };
 
+let defaultSuppliers = [
+  {
+    id: 'sup_1',
+    name: 'Grand Horizon Restaurant',
+    address: '12 MG Road, Indiranagar, Bengaluru',
+    food_type_specialty: 'Multicuisine & Buffet',
+    contact_phone: '+91 98765 43210',
+    verified: true
+  },
+  {
+    id: 'sup_2',
+    name: 'Royal Feast Catering Services',
+    address: '45 Koramangala 5th Block, Bengaluru',
+    food_type_specialty: 'Banquet & Event Meals',
+    contact_phone: '+91 98123 45678',
+    verified: true
+  },
+  {
+    id: 'sup_3',
+    name: 'Green Leaf Bakery & Bistro',
+    address: '88 Jayanagar 4th Block, Bengaluru',
+    food_type_specialty: 'Baked Goods & Fresh Produce',
+    contact_phone: '+91 97654 32109',
+    verified: true
+  },
+  {
+    id: 'sup_4',
+    name: 'Spice Garden Commercial Kitchen',
+    address: '15 Whitefield Main Rd, Bengaluru',
+    food_type_specialty: 'South Indian & Vegetarian Meals',
+    contact_phone: '+91 96543 21098',
+    verified: true
+  }
+];
+
 let ngos = defaultNgos;
+let suppliers = defaultSuppliers;
 let donations = defaultDonations;
 let donationRequests = defaultRequests;
 let pickups = defaultPickups;
@@ -108,6 +144,7 @@ function loadData() {
       const raw = fs.readFileSync(DATA_FILE, 'utf8');
       const data = JSON.parse(raw);
       if (data.ngos) ngos = data.ngos;
+      if (data.suppliers) suppliers = data.suppliers;
       if (data.donations) donations = data.donations;
       if (data.donationRequests) donationRequests = data.donationRequests;
       if (data.pickups) pickups = data.pickups;
@@ -124,6 +161,7 @@ function saveData() {
   try {
     const payload = {
       ngos,
+      suppliers,
       donations,
       donationRequests,
       pickups,
@@ -183,6 +221,39 @@ exports.createNgo = (req, res) => {
     success: true,
     message: 'NGO Shelter registered successfully with verified documents',
     ngo: newNgo
+  });
+};
+
+exports.getSuppliers = (req, res) => {
+  loadData();
+  res.json({ success: true, count: suppliers.length, suppliers });
+};
+
+exports.createSupplier = (req, res) => {
+  loadData();
+  const { name, address, food_type_specialty, contact_phone, supplier_id } = req.body;
+
+  if (!name || !address) {
+    return res.status(400).json({ success: false, message: 'name and address are required' });
+  }
+
+  const newSupplier = {
+    id: supplier_id || `sup_${Date.now()}`,
+    name,
+    address,
+    food_type_specialty: food_type_specialty || 'Multicuisine & Buffet',
+    contact_phone: contact_phone || '+91 98765 43210',
+    verified: true,
+    created_at: new Date().toISOString()
+  };
+
+  suppliers.unshift(newSupplier);
+  saveData();
+
+  res.status(201).json({
+    success: true,
+    message: 'Supplier Restaurant registered successfully',
+    supplier: newSupplier
   });
 };
 

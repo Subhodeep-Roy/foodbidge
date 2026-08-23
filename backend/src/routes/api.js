@@ -3,6 +3,8 @@ const router = express.Router();
 const {
   getNgos,
   createNgo,
+  getSuppliers,
+  createSupplier,
   getDonations,
   createDonation,
   getRecommendation,
@@ -18,6 +20,8 @@ const {
 // REST API Endpoints
 router.get('/ngos', getNgos);
 router.post('/ngos', createNgo);
+router.get('/suppliers', getSuppliers);
+router.post('/suppliers', createSupplier);
 router.get('/donations', getDonations);
 router.post('/donations', createDonation);
 router.get('/donations/:id/recommendation', getRecommendation);
