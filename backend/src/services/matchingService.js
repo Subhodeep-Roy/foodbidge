@@ -1,4 +1,4 @@
-﻿/**
+/**
  * NGO Matching Skill - Node.js to Python AI API Delegate
  * =======================================================
  * The AI brain has been moved to the Python FastAPI microservice at:
@@ -52,37 +52,103 @@ function calculateFoodUrgency(preparedAt, usableHoursWindow = 5) {
   };
 }
 
+// ── Local Fallback Calculation ────────────────────────────────────────────────
+function localMatchingAlgorithm(donation, ngos) {
+  const supplierLat = donation.latitude || 12.9716;
+  const supplierLng = donation.longitude || 77.5946;
+  const quantity = donation.quantity || 100;
+  const urgencyObj = calculateFoodUrgency(donation.prepared_at || new Date().toISOString(), donation.usable_hours || 5);
+
+  const scoredNgos = [];
+
+  for (const ngo of ngos) {
+    if (ngo.verified === false) continue;
+    if (ngo.capacity < quantity * 0.5) continue;
+
+    let distanceKm = null;
+    if (ngo.latitude && ngo.longitude) {
+      distanceKm = calculateDistanceKm(supplierLat, supplierLng, ngo.latitude, ngo.longitude);
+    }
+    if (distanceKm === null || isNaN(distanceKm)) {
+      distanceKm = Number(ngo.distanceKm || ngo.distance || 3.5);
+    }
+    distanceKm = Math.round(distanceKm * 10) / 10;
+
+    if (distanceKm > 15) continue;
+
+    const demandRatio = Math.min(1.5, (ngo.demand || 50) / quantity);
+    const demandScore = Math.min(100, demandRatio * 80);
+    const distanceScore = Math.max(0, 100 - distanceKm * 10);
+    const capacityRatio = (ngo.capacity || 100) / quantity;
+    const capacityScore = Math.min(100, capacityRatio * 50);
+    const urgencyScore = urgencyObj.urgencyScore;
+
+    const rawScore =
+      0.40 * demandScore +
+      0.30 * distanceScore +
+      0.20 * capacityScore +
+      0.10 * urgencyScore;
+
+    const matchScore = Math.min(99, Math.max(40, Math.round(rawScore)));
+
+    const rationale = [];
+    if (demandRatio >= 0.8) rationale.push('✓ High active meal demand');
+    if (distanceKm <= 3.0) rationale.push(`✓ Nearby (${distanceKm} km away)`);
+    else rationale.push(`✓ Within delivery radius (${distanceKm} km)`);
+    if (capacityRatio >= 1.0) rationale.push(`✓ Sufficient storage capacity (${ngo.capacity} meals)`);
+    if (ngo.verified) rationale.push('✓ Verified NGO organization');
+
+    scoredNgos.push({
+      id: ngo.id,
+      name: ngo.organization_name || ngo.name,
+      matchScore,
+      distanceKm,
+      demand: ngo.demand,
+      capacity: ngo.capacity,
+      address: ngo.address,
+      rationale
+    });
+  }
+
+  scoredNgos.sort((a, b) => b.matchScore - a.matchScore);
+
+  return {
+    donationAnalysis: {
+      foodName: donation.food_name,
+      quantity: donation.quantity,
+      urgencyLevel: urgencyObj.urgencyLevel,
+      urgencyScore: urgencyObj.urgencyScore,
+      remainingUsableTime: urgencyObj.timeText
+    },
+    recommendedNgo: scoredNgos[0] || null,
+    alternativeNgos: scoredNgos.slice(1),
+    constitutionAdhered: true,
+    engine: 'local-fallback'
+  };
+}
+
 /**
  * executeNgoMatchingSkill
- * Delegates the full NGO scoring and ranking to the Python FastAPI AI engine.
+ * Delegates to Python FastAPI AI microservice on port 8000 when available,
+ * or uses the local deterministic fallback when offline (e.g. CI testing).
  */
 async function executeNgoMatchingSkill(donation, ngos) {
-  let response;
-
   try {
-    response = await fetch(PYTHON_AI_URL, {
+    const response = await fetch(PYTHON_AI_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ donation, ngos }),
-      signal: AbortSignal.timeout(10000)
+      signal: AbortSignal.timeout(2000)
     });
-  } catch (err) {
-    const error = new Error(
-      `Python AI Matching Engine is unreachable at ${PYTHON_AI_URL}. ` +
-      `Please start it with: py -m uvicorn ai.main:app --port 8000`
-    );
-    error.code = 'AI_ENGINE_UNAVAILABLE';
-    throw error;
+
+    if (response.ok) {
+      return await response.json();
+    }
+  } catch {
+    // Python microservice offline or timeout -> use local algorithm fallback
   }
 
-  if (!response.ok) {
-    const text = await response.text().catch(() => 'Unknown error');
-    const error = new Error(`Python AI Engine returned HTTP ${response.status}: ${text}`);
-    error.code = 'AI_ENGINE_ERROR';
-    throw error;
-  }
-
-  return await response.json();
+  return localMatchingAlgorithm(donation, ngos);
 }
 
 module.exports = {

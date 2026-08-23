@@ -23,6 +23,17 @@ jobs:
             backend/package.json
             frontend/package.json
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install and verify Python AI service
+        working-directory: ai
+        run: |
+          pip install -r requirements.txt
+          python -m py_compile main.py
+
       - name: Install backend dependencies
         working-directory: backend
         run: npm ci || npm install

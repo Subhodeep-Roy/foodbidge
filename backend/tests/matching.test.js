@@ -20,7 +20,7 @@ describe('NGO Matching Skill & Urgency Unit Tests', () => {
     expect(urgency.urgencyScore).toBeGreaterThanOrEqual(80);
   });
 
-  test('executeNgoMatchingSkill should exclude unverified NGOs per Constitution Rule 1', () => {
+  test('executeNgoMatchingSkill should exclude unverified NGOs per Constitution Rule 1', async () => {
     const donation = {
       food_name: '50 Meals',
       quantity: 50,
@@ -49,12 +49,12 @@ describe('NGO Matching Skill & Urgency Unit Tests', () => {
       }
     ];
 
-    const result = executeNgoMatchingSkill(donation, ngos);
+    const result = await executeNgoMatchingSkill(donation, ngos);
     expect(result.recommendedNgo.id).toBe('verified_1');
     expect(result.alternativeNgos.length).toBe(0);
   });
 
-  test('executeNgoMatchingSkill should score higher for closer NGOs with higher demand', () => {
+  test('executeNgoMatchingSkill should score higher for closer NGOs with higher demand', async () => {
     const donation = {
       food_name: '100 Meals',
       quantity: 100,
@@ -83,7 +83,7 @@ describe('NGO Matching Skill & Urgency Unit Tests', () => {
       }
     ];
 
-    const result = executeNgoMatchingSkill(donation, ngos);
+    const result = await executeNgoMatchingSkill(donation, ngos);
     expect(result.recommendedNgo.id).toBe('close_ngo');
     expect(result.recommendedNgo.matchScore).toBeGreaterThan(result.alternativeNgos[0].matchScore);
   });
