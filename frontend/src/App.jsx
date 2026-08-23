@@ -847,62 +847,30 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Light Theme Navbar Header */}
-      <header
-        style={{
-          borderBottom: '1px solid rgba(16, 185, 129, 0.2)',
-          background: 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: 'blur(12px)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 100,
-          boxShadow: '0 2px 10px rgba(0,0,0,0.03)'
-        }}
-      >
-        <div
-          style={{
-            maxWidth: '1280px',
-            margin: '0 auto',
-            padding: '1rem 1.5rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '1rem'
-          }}
-        >
+      <header className="header-wrapper">
+        <div className="header-content">
           {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={handleLogout}>
-            <div
-              style={{
-                width: '42px',
-                height: '42px',
-                borderRadius: '12px',
-                background: 'linear-gradient(135deg, #059669 0%, #047857 100%)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 14px rgba(5, 150, 105, 0.25)'
-              }}
-            >
-              <Leaf style={{ color: '#fff', width: '24px', height: '24px' }} />
+          <div className="header-logo-container" onClick={handleLogout}>
+            <div className="header-logo-icon">
+              <Leaf style={{ color: '#fff', width: '22px', height: '22px' }} />
             </div>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontSize: '1.4rem', fontWeight: '800', fontFamily: 'var(--font-heading)', color: '#042f1a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+                <span className="header-logo-title">
                   Food<span className="gradient-text">Bridge</span>
                 </span>
-                <span className="badge badge-success" style={{ fontSize: '0.65rem' }}>
+                <span className="badge badge-success header-logo-badge" style={{ fontSize: '0.65rem' }}>
                   Editorial Edition v16.0
                 </span>
               </div>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              <p className="header-logo-subtitle">
                 Surplus Rescue & AI NGO Matching Platform
               </p>
             </div>
           </div>
 
           {/* Header Controls: Navigation Tabs FIRST, LOGIN AT THE FAR RIGHT */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="header-controls">
             {/* AUXILIARY NAVIGATION TABS */}
             <nav style={{ display: 'flex', gap: '0.35rem' }}>
               <button
@@ -910,8 +878,7 @@ export default function App() {
                   setActiveTab('ngos');
                   setAuthView(null);
                 }}
-                className={activeTab === 'ngos' && !authView ? 'btn-primary' : 'btn-secondary'}
-                style={{ fontSize: '0.85rem', padding: '0.65rem 1rem' }}
+                className={`header-nav-btn ${activeTab === 'ngos' && !authView ? 'btn-primary' : 'btn-secondary'}`}
               >
                 NGO signed
               </button>
@@ -921,10 +888,9 @@ export default function App() {
             <div style={{ position: 'relative' }} ref={loginMenuRef}>
               <button
                 onClick={() => setShowLoginMenu(!showLoginMenu)}
-                className="btn-primary"
-                style={{ fontSize: '0.9rem', padding: '0.65rem 1.35rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                className="btn-primary header-login-btn"
               >
-                <LogIn style={{ width: '16px', height: '16px' }} />
+                <LogIn style={{ width: '15px', height: '15px' }} />
                 <span>
                   {userRole === 'supplier'
                     ? `🍽️ ${supplierName}`
@@ -932,28 +898,12 @@ export default function App() {
                     ? `🏢 ${currentNgoName}`
                     : `🔒 Portal Login`}
                 </span>
-                <ChevronDown style={{ width: '16px', height: '16px', marginLeft: '0.1rem' }} />
+                <ChevronDown style={{ width: '15px', height: '15px', marginLeft: '0.1rem' }} />
               </button>
 
               {/* DROPDOWN MENU FOR THE EXTREME RIGHT LOGIN BUTTON */}
               {showLoginMenu && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '120%',
-                    right: 0,
-                    width: '280px',
-                    background: '#ffffff',
-                    border: '1px solid rgba(16, 185, 129, 0.25)',
-                    borderRadius: 'var(--radius-md)',
-                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12)',
-                    padding: '0.5rem',
-                    zIndex: 200,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.35rem'
-                  }}
-                >
+                <div className="header-dropdown-menu">
                   <p style={{ fontSize: '0.7rem', fontWeight: '700', color: 'var(--text-muted)', padding: '0.4rem 0.6rem 0.2rem', textTransform: 'uppercase' }}>
                     Select Portal Persona
                   </p>
@@ -1025,14 +975,14 @@ export default function App() {
       </header>
 
       {/* Main Container */}
-      <main style={{ flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+      <main style={{ flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: 'clamp(1.25rem, 3vw, 2.5rem) clamp(0.75rem, 3vw, 1.5rem)' }}>
         {/* SUPPLIER LOGIN PAGE */}
         {authView === 'supplier_login' && (
-          <div style={{ maxWidth: '520px', margin: '2rem auto' }}>
+          <div style={{ maxWidth: '520px', width: '100%', margin: 'clamp(1rem, 3vw, 2rem) auto' }}>
             <div
               className="glass-panel"
               style={{
-                padding: '2.5rem 2rem',
+                padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1.2rem, 3vw, 2rem)',
                 background: '#ffffff',
                 border: '2px solid #059669',
                 boxShadow: '0 20px 40px rgba(5, 150, 105, 0.12)',
@@ -1220,11 +1170,11 @@ export default function App() {
 
         {/* NGO SHELTER LOGIN PAGE */}
         {authView === 'ngo_login' && (
-          <div style={{ maxWidth: '520px', margin: '2rem auto' }}>
+          <div style={{ maxWidth: '520px', width: '100%', margin: 'clamp(1rem, 3vw, 2rem) auto' }}>
             <div
               className="glass-panel"
               style={{
-                padding: '2.5rem 2rem',
+                padding: 'clamp(1.5rem, 4vw, 2.5rem) clamp(1.2rem, 3vw, 2rem)',
                 background: '#ffffff',
                 border: '2px solid #0f766e',
                 boxShadow: '0 20px 40px rgba(15, 118, 110, 0.12)',
@@ -1486,7 +1436,7 @@ export default function App() {
                 </div>
 
                 {/* 3. DUAL EDITORIAL PORTAL CARDS (FOOD SUPPLIER & NGO SHELTER) */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '2rem', marginBottom: '4rem' }}>
+                <div className="home-portals-grid">
                   {/* FOOD SUPPLIER PORTAL CARD */}
                   <div
                     className="glass-panel"
@@ -1942,22 +1892,10 @@ export default function App() {
                 })()}
 
                 {/* TWO-COLUMN LAYOUT: LEFT SIDEBAR NAVIGATION & MAIN CONTENT */}
-                <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '2rem', alignItems: 'start' }}>
+                <div className="portal-dashboard-grid">
                   {/* LEFT SIDEBAR NAVIGATION OPTIONS */}
-                  <div
-                    className="glass-panel"
-                    style={{
-                      padding: '1.25rem',
-                      background: '#ffffff',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: '0.75rem',
-                      boxShadow: '0 4px 20px rgba(0, 0, 0, 0.04)',
-                      position: 'sticky',
-                      top: '90px'
-                    }}
-                  >
-                    <div style={{ background: '#f4fbf7', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.3)', marginBottom: '0.5rem' }}>
+                  <div className="glass-panel portal-sidebar">
+                    <div style={{ background: '#f4fbf7', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.3)', marginBottom: '0.25rem' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                         <label style={{ fontSize: '0.725rem', fontWeight: '800', color: '#047857', textTransform: 'uppercase' }}>
                           Logged In Restaurant
@@ -1974,45 +1912,47 @@ export default function App() {
                       </p>
                     </div>
 
-                    <p style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', paddingLeft: '0.5rem', marginBottom: '0.25rem' }}>
+                    <p style={{ fontSize: '0.75rem', fontWeight: '800', color: 'var(--text-muted)', textTransform: 'uppercase', paddingLeft: '0.25rem', marginBottom: '0.1rem' }}>
                       Supplier Navigation
                     </p>
 
-                    <button
-                      onClick={() => {
-                        setSupplierSubTab('create');
-                        setFlowStep('dashboard');
-                      }}
-                      className={supplierSubTab === 'create' ? 'btn-primary' : 'btn-secondary'}
-                      style={{
-                        width: '100%',
-                        justifyContent: 'flex-start',
-                        padding: '0.85rem 1.1rem',
-                        fontSize: '0.925rem',
-                        fontWeight: '700',
-                        border: supplierSubTab === 'create' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
-                      }}
-                    >
-                      <PlusCircle style={{ width: '18px', height: '18px' }} /> Create Surplus Donation
-                    </button>
+                    <div className="portal-sidebar-nav">
+                      <button
+                        onClick={() => {
+                          setSupplierSubTab('create');
+                          setFlowStep('dashboard');
+                        }}
+                        className={supplierSubTab === 'create' ? 'btn-primary' : 'btn-secondary'}
+                        style={{
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          padding: '0.85rem 1.1rem',
+                          fontSize: '0.925rem',
+                          fontWeight: '700',
+                          border: supplierSubTab === 'create' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        <PlusCircle style={{ width: '18px', height: '18px' }} /> Create Surplus Donation
+                      </button>
 
-                    <button
-                      onClick={() => {
-                        setSupplierSubTab('history');
-                        setFlowStep('dashboard');
-                      }}
-                      className={supplierSubTab === 'history' ? 'btn-primary' : 'btn-secondary'}
-                      style={{
-                        width: '100%',
-                        justifyContent: 'flex-start',
-                        padding: '0.85rem 1.1rem',
-                        fontSize: '0.925rem',
-                        fontWeight: '700',
-                        border: supplierSubTab === 'history' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
-                      }}
-                    >
-                      <Layers style={{ width: '18px', height: '18px' }} /> Supplier Activity Stack
-                    </button>
+                      <button
+                        onClick={() => {
+                          setSupplierSubTab('history');
+                          setFlowStep('dashboard');
+                        }}
+                        className={supplierSubTab === 'history' ? 'btn-primary' : 'btn-secondary'}
+                        style={{
+                          width: '100%',
+                          justifyContent: 'flex-start',
+                          padding: '0.85rem 1.1rem',
+                          fontSize: '0.925rem',
+                          fontWeight: '700',
+                          border: supplierSubTab === 'history' ? '1px solid #059669' : '1px solid rgba(16, 185, 129, 0.2)'
+                        }}
+                      >
+                        <Layers style={{ width: '18px', height: '18px' }} /> Supplier Activity Stack
+                      </button>
+                    </div>
                   </div>
 
                   {/* RIGHT MAIN CONTENT AREA */}
@@ -2680,14 +2620,14 @@ export default function App() {
                 )}
 
                 {/* TWO-COLUMN GRID LAYOUT WITH LEFT SIDEBAR NAVIGATION */}
-                <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '1.5rem', alignItems: 'start' }}>
+                <div className="portal-dashboard-grid">
                   {/* LEFT SIDEBAR NAVIGATION */}
-                  <div className="glass-panel" style={{ padding: '1.25rem', background: '#ffffff', position: 'sticky', top: '2rem' }}>
-                    <p style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '1rem' }}>
+                  <div className="glass-panel portal-sidebar">
+                    <p style={{ fontSize: '0.75rem', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
                       NGO Navigation Menu
                     </p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div className="portal-sidebar-nav">
                       <button
                         onClick={() => setNgoSubTab('requests')}
                         style={{
