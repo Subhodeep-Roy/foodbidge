@@ -1405,7 +1405,7 @@ export default function App() {
                                 border: '2px dashed var(--primary)',
                                 textAlign: 'center',
                                 boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)',
-                                marginBottom: activeAcceptedLog ? '2rem' : '0'
+                                marginBottom: activeAcceptedLogs.length > 0 ? '2rem' : '0'
                               }}
                             >
                               <div
