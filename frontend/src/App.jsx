@@ -27,17 +27,17 @@ import {
   History,
   Layers,
   LayoutDashboard,
-  Activity,
-  ArrowRight,
-  Leaf,
-  Check,
   Trash2,
   Calculator,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  LogIn,
+  ChevronDown,
   HelpCircle,
   Users,
   Compass,
-  LogIn,
-  ChevronDown,
   FileCheck,
   Upload,
   FileText,
@@ -253,10 +253,13 @@ export default function App() {
   };
   const supplierName = currentSupplier.name;
 
-  const [activeTab, setActiveTab] = useState('main'); // 'main', 'ngos', 'governance'
-  const [flowStep, setFlowStep] = useState('dashboard'); // 'dashboard', 'create', 'analyzing', 'recommended', 'broadcast_sent'
-  const [supplierSubTab, setSupplierSubTab] = useState('create'); // 'create', 'history'
-  const [ngoSubTab, setNgoSubTab] = useState('requests'); // 'requests', 'history'
+  // Authentication & Portal Login View State
+  const [authView, setAuthView] = useState(null); // null, 'supplier_login', 'ngo_login'
+  const [loginSelectedSupplier, setLoginSelectedSupplier] = useState('sup_1');
+  const [loginSelectedNgo, setLoginSelectedNgo] = useState('ngo_101');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(null);
+  const [showPasswordText, setShowPasswordText] = useState(false);
 
   // Header Single Login Dropdown State & Click-Outside Ref
   const [showLoginMenu, setShowLoginMenu] = useState(false);
@@ -752,25 +755,62 @@ export default function App() {
 
   const handleLogout = () => {
     setUserRole(null);
+    setAuthView(null);
     setActiveTab('main');
     setFlowStep('dashboard');
     setAnalysisResult(null);
     setNgoNotification(null);
     setShowLoginMenu(false);
+    setPasswordError(null);
+    setPasswordInput('');
   };
 
-  const handleLoginAsSupplier = () => {
-    setUserRole('supplier');
-    setActiveTab('main');
-    setFlowStep('dashboard');
+  const openSupplierLogin = () => {
+    setAuthView('supplier_login');
+    setLoginSelectedSupplier(selectedSupplierUser || 'sup_1');
+    setPasswordInput('');
+    setPasswordError(null);
     setShowLoginMenu(false);
   };
 
-  const handleLoginAsNgo = () => {
-    setUserRole('ngo');
-    setActiveTab('main');
-    setFlowStep('dashboard');
+  const openNgoLogin = () => {
+    setAuthView('ngo_login');
+    setLoginSelectedNgo(selectedNgoUser || 'ngo_101');
+    setPasswordInput('');
+    setPasswordError(null);
     setShowLoginMenu(false);
+  };
+
+  const handleSupplierLoginSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (passwordInput === '1234') {
+      setSelectedSupplierUser(loginSelectedSupplier);
+      setUserRole('supplier');
+      setActiveTab('main');
+      setFlowStep('dashboard');
+      setSupplierSubTab('create');
+      setAuthView(null);
+      setPasswordError(null);
+      setPasswordInput('');
+    } else {
+      setPasswordError('❌ Invalid password! Default portal password is 1234.');
+    }
+  };
+
+  const handleNgoLoginSubmit = (e) => {
+    if (e) e.preventDefault();
+    if (passwordInput === '1234') {
+      setSelectedNgoUser(loginSelectedNgo);
+      setUserRole('ngo');
+      setActiveTab('main');
+      setFlowStep('dashboard');
+      setNgoSubTab('requests');
+      setAuthView(null);
+      setPasswordError(null);
+      setPasswordInput('');
+    } else {
+      setPasswordError('❌ Invalid password! Default portal password is 1234.');
+    }
   };
 
   const isLogActiveInTransit = (l) => {
@@ -869,10 +909,10 @@ export default function App() {
                 <LogIn style={{ width: '16px', height: '16px' }} />
                 <span>
                   {userRole === 'supplier'
-                    ? `Supplier Portal`
+                    ? `🍽️ ${supplierName}`
                     : userRole === 'ngo'
-                    ? `NGO Portal`
-                    : `Login`}
+                    ? `🏢 ${currentNgoName}`
+                    : `🔒 Portal Login`}
                 </span>
                 <ChevronDown style={{ width: '16px', height: '16px', marginLeft: '0.1rem' }} />
               </button>
@@ -884,7 +924,7 @@ export default function App() {
                     position: 'absolute',
                     top: '120%',
                     right: 0,
-                    width: '260px',
+                    width: '280px',
                     background: '#ffffff',
                     border: '1px solid rgba(16, 185, 129, 0.25)',
                     borderRadius: 'var(--radius-md)',
@@ -901,7 +941,7 @@ export default function App() {
                   </p>
 
                   <button
-                    onClick={handleLoginAsSupplier}
+                    onClick={openSupplierLogin}
                     style={{
                       width: '100%',
                       textAlign: 'left',
@@ -920,7 +960,7 @@ export default function App() {
                   </button>
 
                   <button
-                    onClick={handleLoginAsNgo}
+                    onClick={openNgoLogin}
                     style={{
                       width: '100%',
                       textAlign: 'left',
@@ -968,10 +1008,361 @@ export default function App() {
 
       {/* Main Container */}
       <main style={{ flex: 1, maxWidth: '1280px', width: '100%', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+        {/* SUPPLIER LOGIN PAGE */}
+        {authView === 'supplier_login' && (
+          <div style={{ maxWidth: '520px', margin: '2rem auto' }}>
+            <div
+              className="glass-panel"
+              style={{
+                padding: '2.5rem 2rem',
+                background: '#ffffff',
+                border: '2px solid #059669',
+                boxShadow: '0 20px 40px rgba(5, 150, 105, 0.12)',
+                borderRadius: 'var(--radius-lg)'
+              }}
+            >
+              {/* HEADER BADGE */}
+              <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '20px',
+                    background: '#d1fae5',
+                    color: '#047857',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1rem'
+                  }}
+                >
+                  <Utensils style={{ width: '32px', height: '32px' }} />
+                </div>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#042f1a' }}>
+                  Food Supplier Portal Login
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.35rem' }}>
+                  Select your registered restaurant establishment and enter portal password to login.
+                </p>
+              </div>
+
+              {/* ERROR BANNER */}
+              {passwordError && (
+                <div
+                  style={{
+                    background: '#fff1f2',
+                    border: '1px solid #fecdd3',
+                    color: '#be123c',
+                    padding: '0.85rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    marginBottom: '1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <AlertTriangle style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+                  <span>{passwordError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleSupplierLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {/* SELECT REGISTERED RESTAURANT */}
+                <div>
+                  <label style={{ fontSize: '0.825rem', fontWeight: '800', color: '#042f1a', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                    Registered Restaurant / Food Supplier *
+                  </label>
+                  <select
+                    value={loginSelectedSupplier}
+                    onChange={(e) => {
+                      setLoginSelectedSupplier(e.target.value);
+                      setPasswordError(null);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid var(--primary)',
+                      fontSize: '0.95rem',
+                      fontWeight: '700',
+                      color: '#042f1a',
+                      background: '#f4fbf7',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {suppliersList.map((sup) => (
+                      <option key={sup.id} value={sup.id}>
+                        🍽️ {sup.name} ({sup.address})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* ENTER PASSWORD INPUT */}
+                <div>
+                  <label style={{ fontSize: '0.825rem', fontWeight: '800', color: '#042f1a', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                    Portal Access Password *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPasswordText ? 'text' : 'password'}
+                      placeholder="Enter password (default: 1234)"
+                      value={passwordInput}
+                      onChange={(e) => {
+                        setPasswordInput(e.target.value);
+                        setPasswordError(null);
+                      }}
+                      required
+                      autoFocus
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem 2.8rem 0.85rem 1rem',
+                        borderRadius: 'var(--radius-md)',
+                        border: passwordError ? '2px solid #be123c' : '1px solid #d1d5db',
+                        fontSize: '0.95rem',
+                        fontWeight: '600'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordText(!showPasswordText)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.85rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {showPasswordText ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.75rem', color: '#047857', marginTop: '0.4rem', fontWeight: '600' }}>
+                    💡 Default access password for all registered restaurants is <strong>1234</strong>
+                  </p>
+                </div>
+
+                {/* SUBMIT BUTTON */}
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '0.95rem',
+                    fontSize: '1rem',
+                    fontWeight: '800',
+                    marginTop: '0.5rem',
+                    boxShadow: '0 6px 20px rgba(5, 150, 105, 0.3)'
+                  }}
+                >
+                  <LogIn style={{ width: '18px', height: '18px' }} /> Login to Supplier Portal
+                </button>
+
+                {/* BACK TO HOME */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthView(null);
+                    setPasswordError(null);
+                  }}
+                  className="btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '0.875rem' }}
+                >
+                  <ArrowLeft style={{ width: '16px', height: '16px' }} /> Return to Main Home
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* NGO SHELTER LOGIN PAGE */}
+        {authView === 'ngo_login' && (
+          <div style={{ maxWidth: '520px', margin: '2rem auto' }}>
+            <div
+              className="glass-panel"
+              style={{
+                padding: '2.5rem 2rem',
+                background: '#ffffff',
+                border: '2px solid #0f766e',
+                boxShadow: '0 20px 40px rgba(15, 118, 110, 0.12)',
+                borderRadius: 'var(--radius-lg)'
+              }}
+            >
+              {/* HEADER BADGE */}
+              <div style={{ textAlign: 'center', marginBottom: '1.75rem' }}>
+                <div
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '20px',
+                    background: '#ccfbf1',
+                    color: '#0f766e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 1rem'
+                  }}
+                >
+                  <Building2 style={{ width: '32px', height: '32px' }} />
+                </div>
+                <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: '#042f1a' }}>
+                  NGO Shelter Portal Login
+                </h2>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.35rem' }}>
+                  Select your verified NGO shelter organization and enter portal password to login.
+                </p>
+              </div>
+
+              {/* ERROR BANNER */}
+              {passwordError && (
+                <div
+                  style={{
+                    background: '#fff1f2',
+                    border: '1px solid #fecdd3',
+                    color: '#be123c',
+                    padding: '0.85rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '0.85rem',
+                    fontWeight: '700',
+                    marginBottom: '1.5rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem'
+                  }}
+                >
+                  <AlertTriangle style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+                  <span>{passwordError}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleNgoLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {/* SELECT VERIFIED NGO SHELTER */}
+                <div>
+                  <label style={{ fontSize: '0.825rem', fontWeight: '800', color: '#042f1a', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                    Verified NGO Shelter *
+                  </label>
+                  <select
+                    value={loginSelectedNgo}
+                    onChange={(e) => {
+                      setLoginSelectedNgo(e.target.value);
+                      setPasswordError(null);
+                    }}
+                    style={{
+                      width: '100%',
+                      padding: '0.85rem 1rem',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px solid #0d9488',
+                      fontSize: '0.95rem',
+                      fontWeight: '700',
+                      color: '#042f1a',
+                      background: '#f0fdfa',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {ngoList.map((ngo) => (
+                      <option key={ngo.id} value={ngo.id}>
+                        🏢 {ngo.organization_name || ngo.name} ({ngo.address})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* ENTER PASSWORD INPUT */}
+                <div>
+                  <label style={{ fontSize: '0.825rem', fontWeight: '800', color: '#042f1a', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                    Portal Access Password *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <input
+                      type={showPasswordText ? 'text' : 'password'}
+                      placeholder="Enter password (default: 1234)"
+                      value={passwordInput}
+                      onChange={(e) => {
+                        setPasswordInput(e.target.value);
+                        setPasswordError(null);
+                      }}
+                      required
+                      autoFocus
+                      style={{
+                        width: '100%',
+                        padding: '0.85rem 2.8rem 0.85rem 1rem',
+                        borderRadius: 'var(--radius-md)',
+                        border: passwordError ? '2px solid #be123c' : '1px solid #d1d5db',
+                        fontSize: '0.95rem',
+                        fontWeight: '600'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordText(!showPasswordText)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.85rem',
+                        top: '50%',
+                        transform: 'translateY(-50%)',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}
+                    >
+                      {showPasswordText ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.75rem', color: '#0f766e', marginTop: '0.4rem', fontWeight: '600' }}>
+                    💡 Default access password for all verified shelters is <strong>1234</strong>
+                  </p>
+                </div>
+
+                {/* SUBMIT BUTTON */}
+                <button
+                  type="submit"
+                  className="btn-primary"
+                  style={{
+                    width: '100%',
+                    justifyContent: 'center',
+                    padding: '0.95rem',
+                    fontSize: '1rem',
+                    fontWeight: '800',
+                    marginTop: '0.5rem',
+                    background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)',
+                    boxShadow: '0 6px 20px rgba(13, 148, 136, 0.3)'
+                  }}
+                >
+                  <LogIn style={{ width: '18px', height: '18px' }} /> Login to NGO Shelter Portal
+                </button>
+
+                {/* BACK TO HOME */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthView(null);
+                    setPasswordError(null);
+                  }}
+                  className="btn-secondary"
+                  style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '0.875rem' }}
+                >
+                  <ArrowLeft style={{ width: '16px', height: '16px' }} /> Return to Main Home
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'main' && (
           <div>
             {/* HIGH-IMPACT MINIMALIST & EDITORIAL HOME LANDING PAGE DESIGN */}
-            {!userRole && (
+            {!userRole && !authView && (
               <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
 
                 {/* 1. HIGH-IMPACT EDITORIAL HERO HEADER */}
