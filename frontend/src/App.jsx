@@ -41,7 +41,9 @@ import {
   FileCheck,
   Upload,
   FileText,
-  ArrowUpRight
+  ArrowUpRight,
+  Leaf,
+  ArrowRight
 } from 'lucide-react';
 
 // Unified Date & Time Formatter for Both Portals
