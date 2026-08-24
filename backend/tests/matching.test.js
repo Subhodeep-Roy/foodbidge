@@ -1,3 +1,4 @@
+process.env.NODE_ENV = 'test';
 const request = require('supertest');
 const app = require('../src/server');
 const {
@@ -90,6 +91,19 @@ describe('NGO Matching Skill & Urgency Unit Tests', () => {
 });
 
 describe('API Routes & Multi-NGO Request Broadcasting Integration Tests', () => {
+  let testDonationId;
+
+  beforeAll(async () => {
+    const res = await request(app)
+      .post('/api/donations')
+      .send({
+        food_name: '100 Vegetarian Meals',
+        quantity: 100,
+        usable_hours: 5
+      });
+    testDonationId = res.body.donation.id;
+  });
+
   test('GET /health returns status ok', async () => {
     const res = await request(app).get('/health');
     expect(res.statusCode).toBe(200);
@@ -100,7 +114,7 @@ describe('API Routes & Multi-NGO Request Broadcasting Integration Tests', () => 
     const res = await request(app)
       .post('/api/requests/broadcast')
       .send({
-        donationId: 'don_1',
+        donationId: testDonationId,
         selectedNgoIds: ['ngo_1', 'ngo_2']
       });
 

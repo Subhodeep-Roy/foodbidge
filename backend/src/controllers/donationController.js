@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 const { executeNgoMatchingSkill, calculateFoodUrgency } = require('../services/matchingService');
 
-const DATA_FILE = path.join(__dirname, '../../data/store.json');
+const DATA_FILE = process.env.NODE_ENV === 'test'
+  ? path.join(__dirname, '../../data/store.test.json')
+  : path.join(__dirname, '../../data/store.json');
 
 // Default initial data seed
 let defaultNgos = [
@@ -38,55 +40,9 @@ let defaultNgos = [
   }
 ];
 
-let defaultDonations = [
-  {
-    id: 'don_1',
-    supplier_id: 'sup_1',
-    supplier_name: 'Grand Horizon Restaurant',
-    food_name: '100 Vegetarian Meals',
-    quantity: 100,
-    food_type: 'VEGETARIAN',
-    prepared_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    usable_hours: 5,
-    latitude: 12.9716,
-    longitude: 77.5946,
-    status: 'AVAILABLE',
-    accepted_by_ngo_id: null,
-    accepted_by_ngo_name: null,
-    created_at: new Date().toISOString()
-  }
-];
+let defaultDonations = [];
 
-let defaultRequests = [
-  {
-    id: 'req_init_1',
-    donation_id: 'don_1',
-    supplier_name: 'Grand Horizon Restaurant',
-    food_name: '100 Vegetarian Meals',
-    quantity: 100,
-    food_type: 'VEGETARIAN',
-    usable_hours: 5,
-    prepared_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    ngo_id: 'ngo_1',
-    ngo_name: 'Hope Foundation Shelter',
-    status: 'PENDING',
-    requested_at: new Date().toISOString()
-  },
-  {
-    id: 'req_init_2',
-    donation_id: 'don_1',
-    supplier_name: 'Grand Horizon Restaurant',
-    food_name: '100 Vegetarian Meals',
-    quantity: 100,
-    food_type: 'VEGETARIAN',
-    usable_hours: 5,
-    prepared_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-    ngo_id: 'ngo_2',
-    ngo_name: 'Care & Share Shelter',
-    status: 'PENDING',
-    requested_at: new Date().toISOString()
-  }
-];
+let defaultRequests = [];
 
 let defaultPickups = [];
 let defaultImpact = {

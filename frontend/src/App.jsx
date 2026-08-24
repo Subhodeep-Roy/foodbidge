@@ -1367,136 +1367,120 @@ export default function App() {
             {/* HIGH-IMPACT MINIMALIST & EDITORIAL HOME LANDING PAGE DESIGN */}
             {!userRole && !authView && (
               <div style={{ maxWidth: '1120px', margin: '0 auto' }}>
-
-                {/* 1. HIGH-IMPACT EDITORIAL HERO HEADER */}
-                <div style={{ textAlign: 'center', padding: '1rem 0 3.5rem' }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: '#d1fae5', color: '#047857', padding: '0.4rem 1.25rem', borderRadius: '30px', fontSize: '0.78rem', fontWeight: '800', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>
-                    ✦ ACCREDITED SURPLUS FOOD RESCUE PROTOCOL ✦
-                  </div>
-
-                  <h1 style={{ fontSize: '3.8rem', fontWeight: '900', lineHeight: '1.08', color: '#042f1a', letterSpacing: '-0.04em', maxWidth: '920px', margin: '0 auto' }}>
-                    Zero Food Waste. <br/>
-                    <span className="gradient-text">Direct to Local Shelters.</span>
+                {/* 1. CLEAN HERO HEADER */}
+                <div style={{ textAlign: 'center', padding: '2rem 0 2.5rem' }}>
+                  <h1 style={{ fontSize: 'clamp(2.2rem, 5vw, 3.4rem)', fontWeight: '800', lineHeight: '1.15', color: 'var(--text-main)', letterSpacing: '-0.03em', maxWidth: '820px', margin: '0 auto' }}>
+                    Zero Food Waste. <span style={{ color: 'var(--primary)' }}>Rescued in Real Time.</span>
                   </h1>
 
-                  <p style={{ color: '#374151', fontSize: '1.2rem', maxWidth: '720px', margin: '1.25rem auto 0', lineHeight: '1.65', fontWeight: '450' }}>
-                    FoodBridge connects restaurant & caterer surplus directly with verified shelters and community kitchens through real-time AI spoilage evaluation and volunteer dispatch.
+                  <p style={{ color: 'var(--text-muted)', fontSize: '1.05rem', maxWidth: '640px', margin: '0.85rem auto 0', lineHeight: '1.6' }}>
+                    FoodBridge connects restaurant and caterer surplus directly with verified shelters and community kitchens through real-time AI spoilage evaluation.
                   </p>
                 </div>
 
-                {/* 2. MINIMALIST EDITORIAL METRIC STRIP */}
+                {/* 2. SIMPLE METRICS STRIP */}
                 <div
                   className="glass-panel"
                   style={{
-                    padding: '1.75rem 2.5rem',
-                    marginBottom: '4rem',
-                    background: '#ffffff',
-                    border: '1px solid rgba(16, 185, 129, 0.25)',
-                    borderRadius: 'var(--radius-xl)',
-                    boxShadow: '0 12px 35px rgba(5, 150, 105, 0.06)'
+                    padding: '1.25rem 2rem',
+                    marginBottom: '3rem',
+                    background: '#ffffff'
                   }}
                 >
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '2rem', textAlign: 'center' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '1.5rem', textAlign: 'center' }}>
                     <div>
-                      <p style={{ fontSize: '2.2rem', fontWeight: '900', color: '#047857', letterSpacing: '-0.03em' }}>
-                        {(impact?.meals_rescued || 450).toLocaleString()}+
+                      <p style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)' }}>
+                        {impact?.meals_rescued || 450}+
                       </p>
-                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '0.2rem' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
                         Meals Rescued
                       </p>
                     </div>
 
-                    <div style={{ borderLeft: '1px solid rgba(0,0,0,0.06)', paddingLeft: '1rem' }}>
-                      <p style={{ fontSize: '2.2rem', fontWeight: '900', color: '#059669', letterSpacing: '-0.03em' }}>
+                    <div>
+                      <p style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0d9488' }}>
                         {Number(impact?.food_saved_kg || 189).toFixed(1)} kg
                       </p>
-                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '0.2rem' }}>
-                        Food Saved
+                      <p style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
+                        Food Diverted
                       </p>
                     </div>
 
-                    <div style={{ borderLeft: '1px solid rgba(0,0,0,0.06)', paddingLeft: '1rem' }}>
-                      <p style={{ fontSize: '2.2rem', fontWeight: '900', color: '#0d9488', letterSpacing: '-0.03em' }}>
-                        {Number(impact?.co2_saved_kg || 340).toFixed(2)} kg
+                    <div>
+                      <p style={{ fontSize: '1.8rem', fontWeight: '800', color: '#059669' }}>
+                        {Number(impact?.co2_saved_kg || 340).toFixed(1)} kg
                       </p>
-                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '0.2rem' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
                         CO₂ Avoided
                       </p>
                     </div>
 
-                    <div style={{ borderLeft: '1px solid rgba(0,0,0,0.06)', paddingLeft: '1rem' }}>
-                      <p style={{ fontSize: '2.2rem', fontWeight: '900', color: '#d97706', letterSpacing: '-0.03em' }}>
+                    <div>
+                      <p style={{ fontSize: '1.8rem', fontWeight: '800', color: '#d97706' }}>
                         {impact?.pickups_completed || 12}
                       </p>
-                      <p style={{ fontSize: '0.8rem', fontWeight: '700', color: '#374151', textTransform: 'uppercase', letterSpacing: '0.04em', marginTop: '0.2rem' }}>
+                      <p style={{ fontSize: '0.75rem', fontWeight: '600', color: 'var(--text-muted)', textTransform: 'uppercase', marginTop: '0.15rem' }}>
                         Completed Pickups
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* 3. DUAL EDITORIAL PORTAL CARDS (FOOD SUPPLIER & NGO SHELTER) */}
+                {/* 3. DUAL PORTAL CARDS (FOOD SUPPLIER & NGO SHELTER) */}
                 <div className="home-portals-grid">
                   {/* FOOD SUPPLIER PORTAL CARD */}
                   <div
                     className="glass-panel"
                     style={{
-                      padding: '2.75rem 2.25rem',
-                      background: '#ffffff',
-                      border: '1.5px solid rgba(16, 185, 129, 0.25)',
-                      borderRadius: 'var(--radius-xl)',
-                      boxShadow: '0 12px 35px rgba(5, 150, 105, 0.07)',
+                      padding: '2rem',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      transition: 'all 0.25 ease'
+                      cursor: 'pointer'
                     }}
                     onClick={openSupplierLogin}
                   >
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                         <div
                           style={{
-                            width: '56px',
-                            height: '56px',
-                            borderRadius: '16px',
-                            background: '#d1fae5',
-                            color: '#047857',
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '10px',
+                            background: '#ecfdf5',
+                            color: '#059669',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                         >
-                          <Utensils style={{ width: '28px', height: '28px' }} />
+                          <Utensils style={{ width: '24px', height: '24px' }} />
                         </div>
-                        <span style={{ fontSize: '0.75rem', fontWeight: '800', background: '#ecfdf5', color: '#047857', padding: '0.35rem 0.85rem', borderRadius: '20px', textTransform: 'uppercase' }}>
-                          For Caterers & Messes
-                        </span>
+                        <span className="badge badge-success">For Caterers & Messes</span>
                       </div>
 
-                      <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.6rem' }}>
+                      <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.4rem' }}>
                         Food Supplier Portal
                       </h2>
-                      <p style={{ color: '#4b5563', fontSize: '0.95rem', lineHeight: '1.65', marginBottom: '1.75rem' }}>
-                        Post excess kitchen preparation or packaged inventory. Instantly score spoilage window and trigger parallel NGO dispatch offers.
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.55', marginBottom: '1.25rem' }}>
+                        Post surplus kitchen preparation. Calculate safe consumption window and broadcast offers to verified candidate shelters.
                       </p>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#059669' }} /> AI Spoilage & Urgency Index Calculation
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: 'var(--primary)', flexShrink: 0 }} /> AI Spoilage & Urgency Calculation
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#059669' }} /> Multi-NGO Selection Checkbox Controls
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: 'var(--primary)', flexShrink: 0 }} /> Multi-NGO Selection Controls
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#059669' }} /> Real-Time Persisted Audit Activity Stack
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: 'var(--primary)', flexShrink: 0 }} /> Real-Time Activity Stack
                         </div>
                       </div>
                     </div>
 
-                    <button className="btn-primary" style={{ width: '100%', justifyContent: 'center', fontSize: '1.05rem', padding: '1rem 1.5rem', borderRadius: 'var(--radius-md)' }}>
-                      Enter Supplier Portal <ArrowRight style={{ width: '18px', height: '18px' }} />
+                    <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                      Enter Supplier Portal <ArrowRight style={{ width: '16px', height: '16px' }} />
                     </button>
                   </div>
 
@@ -1504,123 +1488,104 @@ export default function App() {
                   <div
                     className="glass-panel"
                     style={{
-                      padding: '2.75rem 2.25rem',
-                      background: '#ffffff',
-                      border: '1.5px solid rgba(13, 148, 136, 0.25)',
-                      borderRadius: 'var(--radius-xl)',
-                      boxShadow: '0 12px 35px rgba(13, 148, 136, 0.07)',
+                      padding: '2rem',
                       display: 'flex',
                       flexDirection: 'column',
                       justifyContent: 'space-between',
-                      cursor: 'pointer',
-                      transition: 'all 0.25 ease'
+                      cursor: 'pointer'
                     }}
                     onClick={openNgoLogin}
                   >
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
                         <div
                           style={{
-                            width: '56px',
-                            height: '56px',
-                            borderRadius: '16px',
-                            background: '#ccfbf1',
-                            color: '#0f766e',
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '10px',
+                            background: '#f0fdfa',
+                            color: '#0d9488',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}
                         >
-                          <Building2 style={{ width: '28px', height: '28px' }} />
+                          <Building2 style={{ width: '24px', height: '24px' }} />
                         </div>
-                        <span style={{ fontSize: '0.75rem', fontWeight: '800', background: '#f0fdf4', color: '#0f766e', padding: '0.35rem 0.85rem', borderRadius: '20px', textTransform: 'uppercase' }}>
-                          For Verified Shelters
-                        </span>
+                        <span className="badge badge-medium">For Verified Shelters</span>
                       </div>
 
-                      <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.6rem' }}>
+                      <h2 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.4rem' }}>
                         NGO Shelter Portal
                       </h2>
-                      <p style={{ color: '#4b5563', fontSize: '0.95rem', lineHeight: '1.65', marginBottom: '1.75rem' }}>
-                        Receive incoming surplus food offers from nearby establishments. Accept or decline offers with automated volunteer pickup dispatch.
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', lineHeight: '1.55', marginBottom: '1.25rem' }}>
+                        Receive incoming surplus food offers from nearby establishments. Accept or decline offers with volunteer pickup dispatch.
                       </p>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', marginBottom: '2rem' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#0d9488' }} /> Incoming Food Request Dispatch Stack
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.75rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: '#0d9488', flexShrink: 0 }} /> Incoming Food Request Dispatch Stack
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#0d9488' }} /> Single-Acceptance Conflict Guarding
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: '#0d9488', flexShrink: 0 }} /> Single-Acceptance Conflict Guard
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', fontSize: '0.9rem', color: '#042f1a', fontWeight: '600' }}>
-                          <CheckCircle2 style={{ width: '18px', height: '18px', color: '#0d9488' }} /> Dynamic Switcher for 19 Partner Shelters
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.875rem', color: 'var(--text-main)' }}>
+                          <CheckCircle2 style={{ width: '16px', height: '16px', color: '#0d9488', flexShrink: 0 }} /> Verified Shelter Network
                         </div>
                       </div>
                     </div>
 
-                    <button
-                      className="btn-primary"
-                      style={{
-                        width: '100%',
-                        justifyContent: 'center',
-                        fontSize: '1.05rem',
-                        padding: '1rem 1.5rem',
-                        borderRadius: 'var(--radius-md)',
-                        background: 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)'
-                      }}
-                    >
-                      Enter NGO Portal <ArrowRight style={{ width: '18px', height: '18px' }} />
+                    <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}>
+                      Enter NGO Portal <ArrowRight style={{ width: '16px', height: '16px' }} />
                     </button>
                   </div>
                 </div>
 
-                {/* 4. EDITORIAL 3-STEP PROTOCOL EXPLANATION */}
+                {/* 4. 3-STEP PROTOCOL EXPLANATION */}
                 <div
                   className="glass-panel"
                   style={{
-                    padding: '3rem 2.5rem',
-                    marginBottom: '4rem',
-                    background: '#ffffff',
-                    border: '1px solid rgba(16, 185, 129, 0.2)'
+                    padding: '2.5rem 2rem',
+                    marginBottom: '3rem'
                   }}
                 >
-                  <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#059669', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-                      Rescue Protocol Workflow
+                  <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                      Workflow Protocol
                     </span>
-                    <h2 style={{ fontSize: '2.2rem', fontWeight: '900', color: '#042f1a', marginTop: '0.3rem' }}>
+                    <h2 style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--text-main)', marginTop: '0.25rem' }}>
                       How FoodBridge Operates
                     </h2>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
-                    <div style={{ borderLeft: '3px solid #059669', paddingLeft: '1.25rem' }}>
-                      <span style={{ fontSize: '2.5rem', fontWeight: '900', color: 'rgba(5, 150, 105, 0.25)', display: 'block', lineHeight: 1 }}>01</span>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#042f1a', margin: '0.4rem 0 0.3rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.5rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <span style={{ fontSize: '1.8rem', fontWeight: '800', color: 'var(--primary)', display: 'block', lineHeight: 1 }}>01</span>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)', margin: '0.5rem 0 0.25rem' }}>
                         AI Spoilage & Urgency Analysis
                       </h3>
-                      <p style={{ fontSize: '0.9rem', color: '#4b5563', lineHeight: '1.6' }}>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
                         Food items are evaluated for remaining safe consumption window, quantity, and preparation category.
                       </p>
                     </div>
 
-                    <div style={{ borderLeft: '3px solid #0d9488', paddingLeft: '1.25rem' }}>
-                      <span style={{ fontSize: '2.5rem', fontWeight: '900', color: 'rgba(13, 148, 136, 0.25)', display: 'block', lineHeight: 1 }}>02</span>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#042f1a', margin: '0.4rem 0 0.3rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <span style={{ fontSize: '1.8rem', fontWeight: '800', color: '#0d9488', display: 'block', lineHeight: 1 }}>02</span>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)', margin: '0.5rem 0 0.25rem' }}>
                         4-Vector NGO Match Ranking
                       </h3>
-                      <p style={{ fontSize: '0.9rem', color: '#4b5563', lineHeight: '1.6' }}>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
                         Ranks candidate shelters based on demand ratio (40%), proximity (30%), capacity (20%), and urgency (10%).
                       </p>
                     </div>
 
-                    <div style={{ borderLeft: '3px solid #d97706', paddingLeft: '1.25rem' }}>
-                      <span style={{ fontSize: '2.5rem', fontWeight: '900', color: 'rgba(217, 119, 6, 0.25)', display: 'block', lineHeight: 1 }}>03</span>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#042f1a', margin: '0.4rem 0 0.3rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <span style={{ fontSize: '1.8rem', fontWeight: '800', color: '#d97706', display: 'block', lineHeight: 1 }}>03</span>
+                      <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: 'var(--text-main)', margin: '0.5rem 0 0.25rem' }}>
                         Volunteer Dispatch & Lock
                       </h3>
-                      <p style={{ fontSize: '0.9rem', color: '#4b5563', lineHeight: '1.6' }}>
-                        The first shelter to accept secures atomic pickup ownership, immediately dispatching a volunteer driver.
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                        The first shelter to accept secures pickup ownership, dispatching a courier partner.
                       </p>
                     </div>
                   </div>
@@ -1630,72 +1595,67 @@ export default function App() {
                 <section
                   className="glass-panel"
                   style={{
-                    padding: '3rem 2.5rem',
-                    marginBottom: '4rem',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%)',
-                    border: '1px solid rgba(16, 185, 129, 0.25)'
+                    padding: '2.5rem 2rem',
+                    marginBottom: '3rem'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
                     <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.3rem' }}>
-                        <Building2 style={{ color: '#059669', width: '20px', height: '20px' }} />
-                        <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#059669', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                          Verified Partner Network
-                        </span>
-                      </div>
-                      <h2 style={{ fontSize: '2rem', fontWeight: '900', color: '#042f1a' }}>
-                        Accredited Partner Organizations
+                      <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)' }}>
+                        Verified Partner Organizations
                       </h2>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '0.2rem' }}>
+                        Accredited shelters, food banks, and community kitchens.
+                      </p>
                     </div>
 
                     <button
                       onClick={() => setActiveTab('ngos')}
                       className="btn-primary"
-                      style={{ padding: '0.75rem 1.4rem', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                      style={{ fontSize: '0.85rem' }}
                     >
-                      View Verified NGO Directory <ArrowRight style={{ width: '16px', height: '16px' }} />
+                      View Directory <ArrowRight style={{ width: '15px', height: '15px' }} />
                     </button>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
-                    <div className="glass-card" style={{ background: '#ffffff', padding: '1.5rem' }}>
-                      <Utensils style={{ color: '#047857', width: '24px', height: '24px', marginBottom: '0.75rem' }} />
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.4rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <Utensils style={{ color: 'var(--primary)', width: '22px', height: '22px', marginBottom: '0.5rem' }} />
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                         Community Kitchens
                       </h3>
-                      <p style={{ fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.5' }}>
-                        Providing prepared hot meals to daily wage workers and urban relief centers.
+                      <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: '1.45' }}>
+                        Providing prepared meals to daily wage workers and urban relief centers.
                       </p>
                     </div>
 
-                    <div className="glass-card" style={{ background: '#ffffff', padding: '1.5rem' }}>
-                      <Users style={{ color: '#0f766e', width: '24px', height: '24px', marginBottom: '0.75rem' }} />
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.4rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <Users style={{ color: '#0f766e', width: '22px', height: '22px', marginBottom: '0.5rem' }} />
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                         Child & Women Welfare
                       </h3>
-                      <p style={{ fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.5' }}>
-                        Supplying fresh, safe meals to orphanages, after-school care, and maternity centers.
+                      <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: '1.45' }}>
+                        Supplying fresh meals to orphanages and care centers.
                       </p>
                     </div>
 
-                    <div className="glass-card" style={{ background: '#ffffff', padding: '1.5rem' }}>
-                      <Building2 style={{ color: '#b45309', width: '24px', height: '24px', marginBottom: '0.75rem' }} />
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.4rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <Building2 style={{ color: '#b45309', width: '22px', height: '22px', marginBottom: '0.5rem' }} />
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                         Emergency Shelters
                       </h3>
-                      <p style={{ fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.5' }}>
-                        Supporting night shelters and elder homes with daily surplus meal deliveries.
+                      <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: '1.45' }}>
+                        Supporting night shelters and elder homes with daily surplus meals.
                       </p>
                     </div>
 
-                    <div className="glass-card" style={{ background: '#ffffff', padding: '1.5rem' }}>
-                      <FileCheck style={{ color: '#0369a1', width: '24px', height: '24px', marginBottom: '0.75rem' }} />
-                      <h3 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.4rem' }}>
+                    <div className="glass-card" style={{ padding: '1.25rem' }}>
+                      <FileCheck style={{ color: '#0369a1', width: '22px', height: '22px', marginBottom: '0.5rem' }} />
+                      <h3 style={{ fontSize: '0.95rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.25rem' }}>
                         100% Document Verified
                       </h3>
-                      <p style={{ fontSize: '0.85rem', color: '#4b5563', lineHeight: '1.5' }}>
-                        Every shelter possesses verified 80G tax exemption, FSSAI licenses, or NGO Darpan registration.
+                      <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', lineHeight: '1.45' }}>
+                        Verified 80G tax exemption, FSSAI licenses, and NGO Darpan certificates.
                       </p>
                     </div>
                   </div>
@@ -1705,29 +1665,24 @@ export default function App() {
                 <div
                   className="glass-panel"
                   style={{
-                    padding: '3rem 2.5rem',
-                    marginBottom: '4rem',
-                    background: '#ffffff',
-                    border: '1px solid rgba(16, 185, 129, 0.25)'
+                    padding: '2.5rem 2rem',
+                    marginBottom: '3rem'
                   }}
                 >
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', alignItems: 'center' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', alignItems: 'center' }}>
                     <div>
-                      <span style={{ fontSize: '0.8rem', fontWeight: '800', color: '#059669', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Interactive Estimator
-                      </span>
-                      <h2 style={{ fontSize: '2rem', fontWeight: '900', color: '#042f1a', margin: '0.3rem 0 0.5rem' }}>
-                        Calculate Your Surplus Impact
+                      <h2 style={{ fontSize: '1.6rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.35rem' }}>
+                        Surplus Impact Estimator
                       </h2>
-                      <p style={{ color: '#4b5563', fontSize: '0.925rem', marginBottom: '1.75rem', lineHeight: '1.6' }}>
-                        Adjust the slider below to see how many meals, food mass, and greenhouse gas emissions your establishment can rescue.
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1.25rem', lineHeight: '1.5' }}>
+                        Adjust the slider below to calculate meal equivalent, mass diverted, and emissions avoided.
                       </p>
 
-                      <div style={{ background: '#f4fbf7', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
-                        <label style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.75rem' }}>
-                          <span>Surplus Meals Prepared:</span>
-                          <span style={{ color: '#047857', fontSize: '1.25rem' }}>{calcMeals} Meals</span>
-                        </label>
+                      <div style={{ background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', fontWeight: '700', color: 'var(--text-main)', marginBottom: '0.6rem' }}>
+                          <span>Surplus Quantity:</span>
+                          <span style={{ color: 'var(--primary)', fontSize: '1.1rem', fontWeight: '800' }}>{calcMeals} Meals</span>
+                        </div>
                         <input
                           type="range"
                           min="10"
@@ -1735,30 +1690,30 @@ export default function App() {
                           step="10"
                           value={calcMeals}
                           onChange={(e) => setCalcMeals(Number(e.target.value))}
-                          style={{ width: '100%', accentColor: '#059669', cursor: 'pointer' }}
+                          style={{ width: '100%', accentColor: 'var(--primary)', cursor: 'pointer' }}
                         />
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.25rem' }}>
-                      <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem', background: '#f4fbf7' }}>
-                        <p style={{ fontSize: '1.8rem', fontWeight: '900', color: '#047857' }}>{calcMeals}</p>
-                        <p style={{ fontSize: '0.75rem', color: '#4b5563', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>Meals Provided</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                      <div className="glass-card" style={{ textAlign: 'center', padding: '1rem' }}>
+                        <p style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--primary)' }}>{calcMeals}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginTop: '0.15rem' }}>Meals Provided</p>
                       </div>
 
-                      <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem', background: '#ecfdf5' }}>
-                        <p style={{ fontSize: '1.8rem', fontWeight: '900', color: '#059669' }}>{(calcMeals * 0.42).toFixed(1)} kg</p>
-                        <p style={{ fontSize: '0.75rem', color: '#4b5563', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>Food Saved</p>
+                      <div className="glass-card" style={{ textAlign: 'center', padding: '1rem' }}>
+                        <p style={{ fontSize: '1.5rem', fontWeight: '800', color: '#059669' }}>{(calcMeals * 0.42).toFixed(1)} kg</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginTop: '0.15rem' }}>Food Saved</p>
                       </div>
 
-                      <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem', background: '#ccfbf1' }}>
-                        <p style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0d9488' }}>{(calcMeals * 0.42 * 2.5).toFixed(2)} kg</p>
-                        <p style={{ fontSize: '0.75rem', color: '#4b5563', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>CO₂ Avoided</p>
+                      <div className="glass-card" style={{ textAlign: 'center', padding: '1rem' }}>
+                        <p style={{ fontSize: '1.5rem', fontWeight: '800', color: '#0d9488' }}>{(calcMeals * 0.42 * 2.5).toFixed(1)} kg</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginTop: '0.15rem' }}>CO₂ Avoided</p>
                       </div>
 
-                      <div className="glass-card" style={{ textAlign: 'center', padding: '1.5rem', background: '#fef3c7' }}>
-                        <p style={{ fontSize: '1.8rem', fontWeight: '900', color: '#d97706' }}>{Math.ceil(calcMeals / 3)}</p>
-                        <p style={{ fontSize: '0.75rem', color: '#4b5563', fontWeight: '700', textTransform: 'uppercase', marginTop: '0.2rem' }}>Families Fed</p>
+                      <div className="glass-card" style={{ textAlign: 'center', padding: '1rem' }}>
+                        <p style={{ fontSize: '1.5rem', fontWeight: '800', color: '#d97706' }}>{Math.ceil(calcMeals / 3)}</p>
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', marginTop: '0.15rem' }}>People Fed</p>
                       </div>
                     </div>
                   </div>
@@ -2046,43 +2001,40 @@ export default function App() {
                             <div
                               className="glass-panel"
                               style={{
-                                padding: '2.75rem 2rem',
-                                background: 'linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%)',
-                                border: '2px dashed var(--primary)',
+                                padding: '2.5rem 1.5rem',
                                 textAlign: 'center',
-                                boxShadow: '0 8px 25px rgba(5, 150, 105, 0.08)',
-                                marginBottom: activeAcceptedLogs.length > 0 ? '2rem' : '0'
+                                marginBottom: activeAcceptedLogs.length > 0 ? '1.5rem' : '0'
                               }}
                             >
                               <div
                                 style={{
-                                  width: '64px',
-                                  height: '64px',
-                                  borderRadius: '20px',
-                                  background: '#d1fae5',
-                                  color: '#047857',
+                                  width: '48px',
+                                  height: '48px',
+                                  borderRadius: '10px',
+                                  background: '#ecfdf5',
+                                  color: '#059669',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
-                                  margin: '0 auto 1.25rem'
+                                  margin: '0 auto 1rem'
                                 }}
                               >
-                                <PlusCircle style={{ width: '36px', height: '36px' }} />
+                                <PlusCircle style={{ width: '24px', height: '24px' }} />
                               </div>
 
-                              <h3 style={{ fontSize: '1.75rem', fontWeight: '800', color: '#042f1a', marginBottom: '0.5rem' }}>
+                              <h3 style={{ fontSize: '1.4rem', fontWeight: '800', color: 'var(--text-main)', marginBottom: '0.4rem' }}>
                                 Create Surplus Food Donation
                               </h3>
-                              <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '620px', margin: '0 auto 1.75rem', lineHeight: '1.6' }}>
-                                Post surplus food quantity and usable window to immediately calculate spoilage urgency and broadcast dispatch offers to nearby verified candidate shelters.
+                              <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '560px', margin: '0 auto 1.5rem', lineHeight: '1.5' }}>
+                                Post surplus food quantity and usable window to calculate spoilage urgency and broadcast offers to verified candidate shelters.
                               </p>
 
                               <button
                                 onClick={() => setFlowStep('create')}
                                 className="btn-primary"
-                                style={{ width: '100%', maxWidth: '380px', margin: '0 auto', justifyContent: 'center', fontSize: '1.05rem', padding: '1rem 1.5rem', boxShadow: '0 6px 20px rgba(5, 150, 105, 0.3)' }}
+                                style={{ padding: '0.75rem 1.5rem', fontSize: '0.95rem' }}
                               >
-                                <PlusCircle style={{ width: '20px', height: '20px' }} /> Create & Post Surplus Food Now
+                                <PlusCircle style={{ width: '18px', height: '18px' }} /> Post Surplus Food Donation
                               </button>
                             </div>
 
